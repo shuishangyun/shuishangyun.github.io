@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="PHP正则表达式小结感悟：&amp;emsp;&amp;emsp;2019年寒假到了，为了锻炼我们自己的编码能力，这个寒假准备利用php+html+css+mysql开发一个本地web小网站。在学习的过程中，我重新认识了一遍正则表达式，借用这个机会，将这次的认识记录起来，以免过段时间忘了一些细节。相对以前而言，我觉得这次对正则表达式的认识也有个十之七八了。  正文：&amp;emsp;&amp;emsp;简单的介绍一下谈诉我对正">
+<meta property="og:type" content="article">
+<meta property="og:title" content="PHP正则表达式小结">
+<meta property="og:url" content="http://yoursite.com/2019/01/20/PHP正则表达式小结/index.html">
+<meta property="og:site_name" content="Water Cloud">
+<meta property="og:description" content="PHP正则表达式小结感悟：&amp;emsp;&amp;emsp;2019年寒假到了，为了锻炼我们自己的编码能力，这个寒假准备利用php+html+css+mysql开发一个本地web小网站。在学习的过程中，我重新认识了一遍正则表达式，借用这个机会，将这次的认识记录起来，以免过段时间忘了一些细节。相对以前而言，我觉得这次对正则表达式的认识也有个十之七八了。  正文：&amp;emsp;&amp;emsp;简单的介绍一下谈诉我对正">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2019-01-20T12:16:59.403Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="PHP正则表达式小结">
+<meta name="twitter:description" content="PHP正则表达式小结感悟：&amp;emsp;&amp;emsp;2019年寒假到了，为了锻炼我们自己的编码能力，这个寒假准备利用php+html+css+mysql开发一个本地web小网站。在学习的过程中，我重新认识了一遍正则表达式，借用这个机会，将这次的认识记录起来，以免过段时间忘了一些细节。相对以前而言，我觉得这次对正则表达式的认识也有个十之七八了。  正文：&amp;emsp;&amp;emsp;简单的介绍一下谈诉我对正">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/01/20/PHP正则表达式小结/">
+
+
+
+
+
+  <title>PHP正则表达式小结 | Water Cloud</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Water Cloud</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            About
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-favorite">
+          <a href="/favorite/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heart"></i> <br>
+            
+            favorite
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            Archives
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-schedule">
+          <a href="/schedule/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-calendar"></i> <br>
+            
+            Schedule
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/01/20/PHP正则表达式小结/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Water Cloud">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Water Cloud">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">PHP正则表达式小结</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-01-20T20:16:37+08:00">
+                2019-01-20
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="PHP正则表达式小结"><a href="#PHP正则表达式小结" class="headerlink" title="PHP正则表达式小结"></a>PHP正则表达式小结</h1><h3 id="感悟："><a href="#感悟：" class="headerlink" title="感悟："></a>感悟：</h3><p>&emsp;&emsp;2019年寒假到了，为了锻炼我们自己的编码能力，这个寒假准备利用<code>php+html+css+mysql</code>开发一个本地web小网站。在学习的过程中，我重新认识了一遍正则表达式，借用这个机会，将这次的认识记录起来，以免过段时间忘了一些细节。相对以前而言，我觉得这次对正则表达式的认识也有个十之七八了。</p>
+<hr>
+<h3 id="正文："><a href="#正文：" class="headerlink" title="正文："></a>正文：</h3><p>&emsp;&emsp;简单的介绍一下谈诉我对正则表达式概念的理解，简单的说正则表达式有点像在描述一个或一类字符串的特征，这里的特征通常表现为一串或者一类具有共同特点的字符串（如果说这个特征是一段固定的字符串，它就类似于子串的概念），这个特征通常用来对其他的字符串进行匹配、查找、替换、分割等操作！正则表达式处理字符串的能力十分强大，但并不是所有处理字符串的操作都用到正则表达式，只有在对一些特别复杂的字符串进行操作的时候才会考虑是否使用正则表达式。</p>
+<p>&emsp;&emsp;在PHP中，正则表达式一般通过与三个特定的函数配合使用（<code>preg_match()、preg_match_all()、preg_replace()</code>）。</p>
+<p>简单介绍一下这三个函数的作用：</p>
+<ol>
+<li><p><code>preg_match()</code>：搜索<code>subject</code>与<code>pattern</code>给定的正则表达式的一个匹配。找到一次就停止。</p>
+<p>原型：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">int preg_match ( string $pattern , string $subject [, <span class="keyword">array</span> &amp;$matches [, int $flags = <span class="number">0</span> [, int $offset = <span class="number">0</span> ]]] )</span><br></pre></td></tr></table></figure>
+<p>参数：</p>
+<ul>
+<li><code>pattern</code>：要搜索的模式（特征），字符串类型。</li>
+<li><code>subject</code>：被搜索的模板字符串。</li>
+<li><code>matches</code>:如果提供了参数<code>matches</code>，它将被填充为搜索结果。 <code>$matches[0]</code>将包含完整模式匹配到的文本， <code>$matches[1]</code>将包含第一个捕获子组匹配到的文本，以此类推。</li>
+<li><code>flags</code>：可以被设置为以下标记值：<ul>
+<li><strong>PREG_OFFSET_CAPTURE</strong>如果传递了这个标记，对于每一个出现的匹配返回时会附加字符串偏移量(相对于目标字符串的)。 注意：这会改变填充到<code>matches</code>参数的数组，使其每个元素成为一个由 第0个元素是匹配到的字符串，第1个元素是该匹配字符串 在目标字符串<code>subject</code>中的偏移量。</li>
+</ul>
+</li>
+<li><code>offset</code>：搜索从目标字符串的开始位置开始。可选参数 <code>offset</code> 用于 指定从目标字符串的某个位置开始搜索(单位是字节)。</li>
+</ul>
+<p>返回值：</p>
+<ul>
+<li>返回 <code>pattern</code> 的匹配次数。 它的值将是0次（不匹配）或1次，在第一次匹配后 将会停止搜索。</li>
+</ul>
+</li>
+<li><p><code>preg_match_all()</code>：搜索 subject 中所有匹配 pattern 给定正则表达式的匹配结果并且将它们以 flag 指定顺序输出到 matches 中。在第一个匹配找到后, 子序列继续从最后一次匹配位置搜索。</p>
+<p>原型：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">int preg_match_all ( string $pattern , string $subject [, <span class="keyword">array</span> &amp;$matches [, int $flags = PREG_PATTERN_ORDER [, int $offset = <span class="number">0</span> ]]] )</span><br></pre></td></tr></table></figure>
+<p>参数：</p>
+<ul>
+<li><code>$pattern</code>: 要搜索的模式，字符串形式。</li>
+<li><code>$subject</code>: 输入字符串。</li>
+<li><code>$matches</code>: 多维数组，作为输出参数输出所有匹配结果, 数组排序通过flags指定。</li>
+<li><code>$flags</code>：可以结合下面标记使用(注意不能同时使用<code>PREG_PATTERN_ORDER</code>和 <code>PREG_SET_ORDER</code>)：<ul>
+<li><code>PREG_PATTERN_ORDER</code>: 结果排序为<code>$matches[0]</code>保存完整模式的所有匹配, <code>$matches[1]</code>保存第一个子组的所有匹配，以此类推。</li>
+<li><code>PREG_SET_ORDER</code>: 结果排序为<code>$matches[0]</code>包含第一次匹配得到的所有匹配(包含子组)， <code>$matches[1]</code>是包含第二次匹配到的所有匹配(包含子组)的数组，以此类推。</li>
+<li><code>PREG_OFFSET_CAPTURE</code>: 如果这个标记被传递，每个发现的匹配返回时会增加它相对目标字符串的偏移量。</li>
+</ul>
+</li>
+<li><code>offset</code>: 通常， 查找时从目标字符串的开始位置开始。可选参数<code>offset</code>用于 从目标字符串中指定位置开始搜索(单位是字节)。</li>
+</ul>
+<p>返回值：</p>
+<ul>
+<li>返回完整匹配次数（可能是0），或者如果发生错误返回FALSE。</li>
+</ul>
+</li>
+<li><p><code>preg_replace()</code>:搜索 subject 中匹配 pattern 的部分， 以 replacement 进行替换。</p>
+<p>原型：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mixed preg_replace ( mixed $pattern , mixed $replacement , mixed $subject [, int $limit = <span class="number">-1</span> [, int &amp;$count ]] )</span><br></pre></td></tr></table></figure>
+<p>参数：</p>
+<ul>
+<li><code>$pattern</code>: 要搜索的模式，可以是字符串或一个字符串数组。</li>
+<li><code>$replacement</code>: 用于替换的字符串或字符串数组。</li>
+<li><code>$subject</code>: 要搜索替换的目标字符串或字符串数组。</li>
+<li><code>$limit</code>: 可选，对于每个模式用于每个<code>$subject</code> 字符串的最大可替换次数。 默认是-1（无限制）。</li>
+<li><code>$count</code>: 可选，为替换执行的次数。</li>
+</ul>
+<p>返回值：</p>
+<ul>
+<li>如果 subject 是一个数组， preg_replace() 返回一个数组， 其他情况下返回一个字符串。</li>
+<li>如果匹配被查找到，替换后的 subject 被返回，其他情况下 返回没有改变的 subject。如果发生错误，返回 NULL。</li>
+</ul>
+</li>
+</ol>
+<h4 id="正则表达式："><a href="#正则表达式：" class="headerlink" title="正则表达式："></a>正则表达式：</h4><p>下面选择用preg_match_all()配合正则表达式进行介绍操作字符串的过程。</p>
+<p>&emsp;&emsp;正则表达式的语法规则：由一个或多个普通字符或者元字符组成的一个字符串，由定界符<code>/</code>来表示正则表达式的开始和结束格式为<code>/特征字符串/</code>！此外，正则表达式还可以用除字母、数字和反斜线以外的字符作为定界符，例如<code>#、！、{}、|</code>等，但要保证始末位置的定界符一致。</p>
+<ol>
+<li><h5 id="普通字符："><a href="#普通字符：" class="headerlink" title="普通字符："></a>普通字符：</h5><p>一般情况下指的都是26个英文字母（a到z）包括大小写、阿拉伯数字0-9、单引号和双引号。</p>
+<ul>
+<li><p>纯普通字符匹配举例：</p>
+</li>
+<li><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">	$pattern=&apos;/test/&apos;;//此时的$pattern就是一个存储有正则表达式的变量</span><br><span class="line">	$str=&quot;testTestTEXT&quot;;//该字符串为被搜索的字符串</span><br><span class="line">	var_dump(preg_match_all($pattern, $str, $arr));</span><br><span class="line">	var_dump($arr);</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+<p>结果：</p>
+</li>
+<li><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">int(<span class="number">1</span>) <span class="comment">//preg_match_all的返回值，表示在字符串搜索到一次</span></span><br><span class="line"><span class="keyword">array</span>(<span class="number">1</span>) &#123;<span class="comment">//preg_match_all创建的数组，表示匹配到字符串的值和偏移量</span></span><br><span class="line">  [<span class="number">0</span>]=&gt;</span><br><span class="line">  <span class="keyword">array</span>(<span class="number">1</span>) &#123;</span><br><span class="line">    [<span class="number">0</span>]=&gt;</span><br><span class="line">    string(<span class="number">4</span>) <span class="string">"test"</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li></li>
+</ul>
+</li>
+<li><h5 id="元字符："><a href="#元字符：" class="headerlink" title="元字符："></a>元字符：</h5><p>能对正则表达式特征进行概括，代表某一类字符串，有特殊功能的字符（比如*、+、？等）。</p>
+<ul>
+<li><p>含元字符举例：</p>
+</li>
+<li><p><code>\d</code>和<code>\D</code>：前者表示任意十进制数（0-9）中的一个字符，后者表示除任意十进制数（0-9）外的其他字符中的一个字符。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">	$pattern=<span class="string">'/t\dst/'</span>;<span class="comment">//\d匹配十进制数</span></span><br><span class="line">	$str=<span class="string">"t1stTestTEXT"</span>;<span class="comment">//该字符串为被搜索的字符串</span></span><br><span class="line">	var_dump(preg_match_all($pattern, $str, $arr));</span><br><span class="line">	var_dump($arr);</span><br><span class="line"><span class="meta">?&gt;</span></span><br><span class="line"><span class="comment">/*该结果成功，可匹配</span></span><br><span class="line"><span class="comment">&lt;?php</span></span><br><span class="line"><span class="comment">	$pattern='/t\Dst/';//\D匹配除十进制数外的一个字符</span></span><br><span class="line"><span class="comment">	$str="testTestTEXT";//该字符串为被搜索的字符串</span></span><br><span class="line"><span class="comment">	var_dump(preg_match_all($pattern, $str, $arr));</span></span><br><span class="line"><span class="comment">	var_dump($arr);</span></span><br><span class="line"><span class="comment">?&gt;*/</span></span><br></pre></td></tr></table></figure>
+<p>结果：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">int(<span class="number">1</span>)</span><br><span class="line"><span class="keyword">array</span>(<span class="number">1</span>) &#123;</span><br><span class="line">  [<span class="number">0</span>]=&gt;</span><br><span class="line">  <span class="keyword">array</span>(<span class="number">1</span>) &#123;</span><br><span class="line">    [<span class="number">0</span>]=&gt;</span><br><span class="line">    string(<span class="number">4</span>) <span class="string">"t1st"</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><code>\s</code>和<code>\S</code>：前者表示任意空白字符（换页符、换行符、回车符、制表符、垂直制表符）中的一个字符，后者表示除空白字符（换页符、换行符、回车符、制表符、垂直制表符）外的其他字符中的一个字符。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">	$pattern=<span class="string">'/t\sst/'</span>;<span class="comment">//\s匹配空白字符</span></span><br><span class="line">	$str=<span class="string">"t\nstTst\tstTEXT"</span>;<span class="comment">//该字符串为被搜索的字符串</span></span><br><span class="line">	var_dump(preg_match_all($pattern, $str, $arr));</span><br><span class="line">	var_dump($arr);</span><br><span class="line"><span class="meta">?&gt;</span></span><br><span class="line"><span class="comment">/*该结果成功，可匹配</span></span><br><span class="line"><span class="comment">&lt;?php</span></span><br><span class="line"><span class="comment">	$pattern='/t\Sst/';//\S匹配除空白字符外的一个字符</span></span><br><span class="line"><span class="comment">	$str="testTestTEXT";//该字符串为被搜索的字符串</span></span><br><span class="line"><span class="comment">	var_dump(preg_match_all($pattern, $str, $arr));</span></span><br><span class="line"><span class="comment">	var_dump($arr);</span></span><br><span class="line"><span class="comment">?&gt;*/</span></span><br></pre></td></tr></table></figure>
+<p>结果：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">int(<span class="number">2</span>)</span><br><span class="line"><span class="keyword">array</span>(<span class="number">1</span>) &#123;</span><br><span class="line">  [<span class="number">0</span>]=&gt;</span><br><span class="line">  <span class="keyword">array</span>(<span class="number">2</span>) &#123;</span><br><span class="line">    [<span class="number">0</span>]=&gt;</span><br><span class="line">    string(<span class="number">4</span>) <span class="string">"t</span></span><br><span class="line"><span class="string">st"</span></span><br><span class="line">    [<span class="number">1</span>]=&gt;</span><br><span class="line">    string(<span class="number">4</span>) <span class="string">"t	st"</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><code>\w</code>和<code>\W</code>：前者表示任意数字或字母或下划线中的一个字符，后者表示除任意数字或字母或下划线外的其他字符中的一个字符。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">	$pattern=<span class="string">'/t\wst/'</span>;<span class="comment">//\w匹配任意数字或字母或下划线</span></span><br><span class="line">	$str=<span class="string">"t_stTstastTEXT"</span>;<span class="comment">//该字符串为被搜索的字符串</span></span><br><span class="line">	var_dump(preg_match_all($pattern, $str, $arr));</span><br><span class="line">	var_dump($arr);</span><br><span class="line"><span class="meta">?&gt;</span></span><br><span class="line"><span class="comment">/*该结果成功，可匹配</span></span><br><span class="line"><span class="comment">&lt;?php</span></span><br><span class="line"><span class="comment">	$pattern='/t\Wst/';//\W匹配除任意数字或字母或下划线外的一个字符</span></span><br><span class="line"><span class="comment">	$str="testTestTEXT";//该字符串为被搜索的字符串</span></span><br><span class="line"><span class="comment">	var_dump(preg_match_all($pattern, $str, $arr));</span></span><br><span class="line"><span class="comment">	var_dump($arr);</span></span><br><span class="line"><span class="comment">?&gt;*/</span></span><br></pre></td></tr></table></figure>
+<p>结果：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">int(<span class="number">2</span>)</span><br><span class="line"><span class="keyword">array</span>(<span class="number">1</span>) &#123;</span><br><span class="line">  [<span class="number">0</span>]=&gt;</span><br><span class="line">  <span class="keyword">array</span>(<span class="number">2</span>) &#123;</span><br><span class="line">    [<span class="number">0</span>]=&gt;</span><br><span class="line">    string(<span class="number">4</span>) <span class="string">"t_st"</span></span><br><span class="line">    [<span class="number">1</span>]=&gt;</span><br><span class="line">    string(<span class="number">4</span>) <span class="string">"tast"</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><code>.</code>：表示除换行符外的任意一个字符。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">	$pattern=<span class="string">'/t.st/'</span>;<span class="comment">//\d匹配除换行符外的任意一个字符</span></span><br><span class="line">	$str=<span class="string">"t_stTstastTEXT"</span>;<span class="comment">//该字符串为被搜索的字符串</span></span><br><span class="line">	var_dump(preg_match_all($pattern, $str, $arr));</span><br><span class="line">	var_dump($arr);</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+<p>结果：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">int(<span class="number">2</span>)</span><br><span class="line"><span class="keyword">array</span>(<span class="number">1</span>) &#123;</span><br><span class="line">  [<span class="number">0</span>]=&gt;</span><br><span class="line">  <span class="keyword">array</span>(<span class="number">2</span>) &#123;</span><br><span class="line">    [<span class="number">0</span>]=&gt;</span><br><span class="line">    string(<span class="number">4</span>) <span class="string">"t_st"</span></span><br><span class="line">    [<span class="number">1</span>]=&gt;</span><br><span class="line">    string(<span class="number">4</span>) <span class="string">"tast"</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><code>*</code>、<code>+</code>和<code>？</code>：<code>*</code>表示只含其前面第一个字符并连续重复0次，或1次，或多次的一串字符串；<code>+</code>表示只含其前面第一个字符并连续重复1次，或多次的一串字符串；<code>？</code>表示只含其前面第一个字符并连续重复0次，或1次的一个字符。（注：重复0次就是任意代表任意一个字符，与其前面的第一个字符无关）</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">	$pattern=<span class="string">'/te*st/'</span>;<span class="comment">//*匹配只含其前面第一个字符并连续重复0次，或1次，或多次的一串字符串</span></span><br><span class="line">	$str=<span class="string">"tsttestteeeestTEXT"</span>;<span class="comment">//该字符串为被搜索的字符串</span></span><br><span class="line">	var_dump(preg_match_all($pattern, $str, $arr));</span><br><span class="line">	var_dump($arr);</span><br><span class="line"><span class="meta">?&gt;</span></span><br><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">	$pattern=<span class="string">'/te+st/'</span>;<span class="comment">//+匹配只含其前面第一个字符并连续重复1次，或多次的一串字符串</span></span><br><span class="line">	$str=<span class="string">"tsttestteeeestTEXT"</span>;<span class="comment">//该字符串为被搜索的字符串</span></span><br><span class="line">	var_dump(preg_match_all($pattern, $str, $arr));</span><br><span class="line">	var_dump($arr);</span><br><span class="line"><span class="meta">?&gt;</span></span><br><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">	$pattern=<span class="string">'/te?st/'</span>;<span class="comment">//?匹配只含其前面第一个字符并连续重复0次，或1次的一个字符</span></span><br><span class="line">	$str=<span class="string">"tsttestteeeestTEXT"</span>;<span class="comment">//该字符串为被搜索的字符串</span></span><br><span class="line">	var_dump(preg_match_all($pattern, $str, $arr));</span><br><span class="line">	var_dump($arr);</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+<p>结果：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//*</span></span><br><span class="line">int(<span class="number">3</span>)</span><br><span class="line"><span class="keyword">array</span>(<span class="number">1</span>) &#123;</span><br><span class="line">  [<span class="number">0</span>]=&gt;</span><br><span class="line">  <span class="keyword">array</span>(<span class="number">3</span>) &#123;</span><br><span class="line">    [<span class="number">0</span>]=&gt;</span><br><span class="line">    string(<span class="number">3</span>) <span class="string">"tst"</span></span><br><span class="line">    [<span class="number">1</span>]=&gt;</span><br><span class="line">    string(<span class="number">4</span>) <span class="string">"test"</span></span><br><span class="line">    [<span class="number">2</span>]=&gt;</span><br><span class="line">    string(<span class="number">7</span>) <span class="string">"teeeest"</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//+</span></span><br><span class="line">int(<span class="number">2</span>)</span><br><span class="line"><span class="keyword">array</span>(<span class="number">1</span>) &#123;</span><br><span class="line">  [<span class="number">0</span>]=&gt;</span><br><span class="line">  <span class="keyword">array</span>(<span class="number">2</span>) &#123;</span><br><span class="line">    [<span class="number">0</span>]=&gt;</span><br><span class="line">    string(<span class="number">4</span>) <span class="string">"test"</span></span><br><span class="line">    [<span class="number">1</span>]=&gt;</span><br><span class="line">    string(<span class="number">7</span>) <span class="string">"teeeest"</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//?</span></span><br><span class="line">int(<span class="number">2</span>)</span><br><span class="line"><span class="keyword">array</span>(<span class="number">1</span>) &#123;</span><br><span class="line">  [<span class="number">0</span>]=&gt;</span><br><span class="line">  <span class="keyword">array</span>(<span class="number">2</span>) &#123;</span><br><span class="line">    [<span class="number">0</span>]=&gt;</span><br><span class="line">    string(<span class="number">3</span>) <span class="string">"tst"</span></span><br><span class="line">    [<span class="number">1</span>]=&gt;</span><br><span class="line">    string(<span class="number">4</span>) <span class="string">"test"</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><code>{n}</code>、<code>{n,}</code>和<code>{n,m}</code>：<code>{n}</code>表示只含其前面第一个字符并正好连续出现n次的一串字符；<code>{n,}</code>表示只含其前面第一个字符并至少连续出现n次的一串字符；<code>{n,m}</code>表示只含其前面第一个字符并至少连续出现n次，至多出现m次的一串字符。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">	$pattern=<span class="string">'/te&#123;0&#125;st/'</span>;<span class="comment">//&#123;n&#125;匹配只含其前面第一个字符并正好连续出现n次的一串字符</span></span><br><span class="line">	$str=<span class="string">"tsttestteeeestTEXT"</span>;<span class="comment">//该字符串为被搜索的字符串</span></span><br><span class="line">	var_dump(preg_match_all($pattern, $str, $arr));</span><br><span class="line">	var_dump($arr);</span><br><span class="line"><span class="meta">?&gt;</span></span><br><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">	$pattern=<span class="string">'/te&#123;0,&#125;st/'</span>;<span class="comment">//&#123;n,&#125;匹配只含其前面第一个字符并至少连续出现n次的一串字符</span></span><br><span class="line">	$str=<span class="string">"tsttestteeeestTEXT"</span>;<span class="comment">//该字符串为被搜索的字符串</span></span><br><span class="line">	var_dump(preg_match_all($pattern, $str, $arr));</span><br><span class="line">	var_dump($arr);</span><br><span class="line"><span class="meta">?&gt;</span></span><br><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">	$pattern=<span class="string">'/te&#123;0,2&#125;st/'</span>;<span class="comment">//&#123;n,m&#125;匹配十进制数</span></span><br><span class="line">	$str=<span class="string">"tsttestteeeestTEXT"</span>;<span class="comment">//该字符串为被搜索的字符串</span></span><br><span class="line">	var_dump(preg_match_all($pattern, $str, $arr));</span><br><span class="line">	var_dump($arr);</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+<p>结果：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//&#123;n&#125;</span></span><br><span class="line">int(<span class="number">1</span>)</span><br><span class="line"><span class="keyword">array</span>(<span class="number">1</span>) &#123;</span><br><span class="line">  [<span class="number">0</span>]=&gt;</span><br><span class="line">  <span class="keyword">array</span>(<span class="number">1</span>) &#123;</span><br><span class="line">    [<span class="number">0</span>]=&gt;</span><br><span class="line">    string(<span class="number">3</span>) <span class="string">"tst"</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//&#123;n,&#125;</span></span><br><span class="line">int(<span class="number">3</span>)</span><br><span class="line"><span class="keyword">array</span>(<span class="number">1</span>) &#123;</span><br><span class="line">  [<span class="number">0</span>]=&gt;</span><br><span class="line">  <span class="keyword">array</span>(<span class="number">3</span>) &#123;</span><br><span class="line">    [<span class="number">0</span>]=&gt;</span><br><span class="line">    string(<span class="number">3</span>) <span class="string">"tst"</span></span><br><span class="line">    [<span class="number">1</span>]=&gt;</span><br><span class="line">    string(<span class="number">4</span>) <span class="string">"test"</span></span><br><span class="line">    [<span class="number">2</span>]=&gt;</span><br><span class="line">    string(<span class="number">7</span>) <span class="string">"teeeest"</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//&#123;n/m&#125;</span></span><br><span class="line">int(<span class="number">2</span>)</span><br><span class="line"><span class="keyword">array</span>(<span class="number">1</span>) &#123;</span><br><span class="line">  [<span class="number">0</span>]=&gt;</span><br><span class="line">  <span class="keyword">array</span>(<span class="number">2</span>) &#123;</span><br><span class="line">    [<span class="number">0</span>]=&gt;</span><br><span class="line">    string(<span class="number">3</span>) <span class="string">"tst"</span></span><br><span class="line">    [<span class="number">1</span>]=&gt;</span><br><span class="line">    string(<span class="number">4</span>) <span class="string">"test"</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><code>^、\A</code>和<code>$、\Z</code>：<code>^</code>或<code>\A</code>表示其后第一个字符为字符串开始字符；<code>$</code>或<code>\Z</code>表示其前第一个字符为字符串结束字符。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">	$pattern=<span class="string">'/^test/'</span>;<span class="comment">//^或\A匹配其后第一个字符为字符串开始字符</span></span><br><span class="line">	$str=<span class="string">"testteeeestTEXT"</span>;<span class="comment">//该字符串为被搜索的字符串</span></span><br><span class="line">	var_dump(preg_match_all($pattern, $str, $arr));</span><br><span class="line">	var_dump($arr);</span><br><span class="line"><span class="meta">?&gt;</span></span><br><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">	$pattern=<span class="string">'/test$/'</span>;<span class="comment">//$匹配其前第一个字符为字符串结束字符</span></span><br><span class="line">	$str=<span class="string">"teeeestTEXTtest"</span>;<span class="comment">//该字符串为被搜索的字符串</span></span><br><span class="line">	var_dump(preg_match_all($pattern, $str, $arr));</span><br><span class="line">	var_dump($arr);</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+<p>结果：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//上面两个代码结果一致</span></span><br><span class="line">int(<span class="number">1</span>)</span><br><span class="line"><span class="keyword">array</span>(<span class="number">1</span>) &#123;</span><br><span class="line">  [<span class="number">0</span>]=&gt;</span><br><span class="line">  <span class="keyword">array</span>(<span class="number">1</span>) &#123;</span><br><span class="line">    [<span class="number">0</span>]=&gt;</span><br><span class="line">    string(<span class="number">4</span>) <span class="string">"test"</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><code>|</code>：表示可以存在两个或多个正则表达式。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">	$pattern=<span class="string">'/test|TEXT/'</span>;<span class="comment">//|表示可以存在两个或多个正则表达式</span></span><br><span class="line">	$str=<span class="string">"teeeestTEXTtest"</span>;<span class="comment">//该字符串为被搜索的字符串</span></span><br><span class="line">	var_dump(preg_match_all($pattern, $str, $arr));</span><br><span class="line">	var_dump($arr);</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+<p>结果：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">int(<span class="number">2</span>)</span><br><span class="line"><span class="keyword">array</span>(<span class="number">1</span>) &#123;</span><br><span class="line">  [<span class="number">0</span>]=&gt;</span><br><span class="line">  <span class="keyword">array</span>(<span class="number">2</span>) &#123;</span><br><span class="line">    [<span class="number">0</span>]=&gt;</span><br><span class="line">    string(<span class="number">4</span>) <span class="string">"TEXT"</span></span><br><span class="line">    [<span class="number">1</span>]=&gt;</span><br><span class="line">    string(<span class="number">4</span>) <span class="string">"test"</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><code>[]</code>或<code>[^]</code>：前者表示括号中存在的任意一个字符，后者表示除括号中存在的所有字符之外的任意一个字符。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">	$pattern=<span class="string">'/t[abcde]st/'</span>;<span class="comment">//[]匹配括号中存在的任意一个字符</span></span><br><span class="line">	$str=<span class="string">"testTEXTtast"</span>;<span class="comment">//该字符串为被搜索的字符串</span></span><br><span class="line">	var_dump(preg_match_all($pattern, $str, $arr));</span><br><span class="line">	var_dump($arr);</span><br><span class="line"><span class="meta">?&gt;</span></span><br><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">	$pattern=<span class="string">'/t[^abcde]st/'</span>;<span class="comment">//[^]匹配除括号中存在的所有字符之外的任意一个字符</span></span><br><span class="line">	$str=<span class="string">"testTEXTt_st"</span>;<span class="comment">//该字符串为被搜索的字符串</span></span><br><span class="line">	var_dump(preg_match_all($pattern, $str, $arr));</span><br><span class="line">	var_dump($arr);</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+<p>结果：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//[]</span></span><br><span class="line">int(<span class="number">2</span>)</span><br><span class="line"><span class="keyword">array</span>(<span class="number">1</span>) &#123;</span><br><span class="line">  [<span class="number">0</span>]=&gt;</span><br><span class="line">  <span class="keyword">array</span>(<span class="number">2</span>) &#123;</span><br><span class="line">    [<span class="number">0</span>]=&gt;</span><br><span class="line">    string(<span class="number">4</span>) <span class="string">"test"</span></span><br><span class="line">    [<span class="number">1</span>]=&gt;</span><br><span class="line">    string(<span class="number">4</span>) <span class="string">"tast"</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//[^]</span></span><br><span class="line">int(<span class="number">1</span>)</span><br><span class="line"><span class="keyword">array</span>(<span class="number">1</span>) &#123;</span><br><span class="line">  [<span class="number">0</span>]=&gt;</span><br><span class="line">  <span class="keyword">array</span>(<span class="number">1</span>) &#123;</span><br><span class="line">    [<span class="number">0</span>]=&gt;</span><br><span class="line">    string(<span class="number">4</span>) <span class="string">"t_st"</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><code>()</code>：表示将括弧中的字符串当作一个整体获取，一般配合<code>\\n</code>（n为阿拉伯数字，从1开始依次出现）使用，<code>\\n</code>表示前面匹配到的第n个括号里面的内容。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">	$pattern=<span class="string">'/t(e)st\\1/'</span>;<span class="comment">//()将括弧中的字符串当作一个整体获取</span></span><br><span class="line">	$str=<span class="string">"testeTEXTt_st"</span>;<span class="comment">//该字符串为被搜索的字符串</span></span><br><span class="line">	var_dump(preg_match_all($pattern, $str, $arr));</span><br><span class="line">	var_dump($arr);</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+<p>结果：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">int(<span class="number">1</span>)</span><br><span class="line"><span class="keyword">array</span>(<span class="number">2</span>) &#123;</span><br><span class="line">  [<span class="number">0</span>]=&gt;</span><br><span class="line">  <span class="keyword">array</span>(<span class="number">1</span>) &#123;</span><br><span class="line">    [<span class="number">0</span>]=&gt;</span><br><span class="line">    string(<span class="number">5</span>) <span class="string">"teste"</span></span><br><span class="line">  &#125;</span><br><span class="line">  [<span class="number">1</span>]=&gt;</span><br><span class="line">  <span class="keyword">array</span>(<span class="number">1</span>) &#123;</span><br><span class="line">    [<span class="number">0</span>]=&gt;</span><br><span class="line">    string(<span class="number">1</span>) <span class="string">"e"</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+</li>
+<li><h5 id="元组字符组合（常见）"><a href="#元组字符组合（常见）" class="headerlink" title="元组字符组合（常见）"></a>元组字符组合（常见）</h5><ul>
+<li><p><code>.*</code>：<code>.</code>字符代表除换行符外的任意字符，<code>*</code>字符可代表一串同一个或多个字符组成的字符串。合起来便可以代表随机匹配到的一串由一个或多个未知字符组成的字符串，该组合会尽量匹配长的一串字符串，为贪婪匹配。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">	$pattern=<span class="string">'/t.*t/'</span>;<span class="comment">//.*匹配除换行符外的任意字符</span></span><br><span class="line">	$str=<span class="string">"testeTEXTt_st"</span>;<span class="comment">//该字符串为被搜索的字符串</span></span><br><span class="line">	var_dump(preg_match_all($pattern, $str, $arr));</span><br><span class="line">	var_dump($arr);</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+<p>结果：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">int(<span class="number">1</span>)</span><br><span class="line"><span class="keyword">array</span>(<span class="number">1</span>) &#123;</span><br><span class="line">  [<span class="number">0</span>]=&gt;</span><br><span class="line">  <span class="keyword">array</span>(<span class="number">1</span>) &#123;</span><br><span class="line">    [<span class="number">0</span>]=&gt;</span><br><span class="line">    string(<span class="number">13</span>) <span class="string">"testeTEXTt_st"</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><code>.*?</code>：<code>.</code>字符代表除换行符外的任意字符，<code>*</code>字符可代表其前面的第一个字符，<code>？</code>字符可代表其前面的第一个字符。合起来便是有限长的一个字符串（一次特征字符串），该组合在匹配尽量短的多个字符串，为懒惰匹配。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">	$pattern=<span class="string">'/t.*?t/'</span>;<span class="comment">//.*?匹配除换行符外的任意字符</span></span><br><span class="line">	$str=<span class="string">"testeTEXTt_st"</span>;<span class="comment">//该字符串为被搜索的字符串</span></span><br><span class="line">	var_dump(preg_match_all($pattern, $str, $arr));</span><br><span class="line">	var_dump($arr);</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+<p>结果：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">int(<span class="number">2</span>)</span><br><span class="line"><span class="keyword">array</span>(<span class="number">1</span>) &#123;</span><br><span class="line">  [<span class="number">0</span>]=&gt;</span><br><span class="line">  <span class="keyword">array</span>(<span class="number">2</span>) &#123;</span><br><span class="line">    [<span class="number">0</span>]=&gt;</span><br><span class="line">    string(<span class="number">4</span>) <span class="string">"test"</span></span><br><span class="line">    [<span class="number">1</span>]=&gt;</span><br><span class="line">    string(<span class="number">4</span>) <span class="string">"t_st"</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>等等等等</p>
+</li>
+</ul>
+</li>
+<li><h5 id="模式修正符（常见）"><a href="#模式修正符（常见）" class="headerlink" title="模式修正符（常见）"></a>模式修正符（常见）</h5><p>模式修正符用在定界符后面，用于扩展正则表达式的功能（常见的有<code>i、m、s、U</code>）。</p>
+<ul>
+<li><p><code>i</code>：让正则表达式在匹配的时候不区分大小写</p>
+<p>举例：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">	$pattern=<span class="string">'/test/i'</span>;<span class="comment">//i让正则表达式在匹配的时候不区分大小写</span></span><br><span class="line">	$str=<span class="string">"testeTESTtEst"</span>;<span class="comment">//该字符串为被搜索的字符串</span></span><br><span class="line">	var_dump(preg_match_all($pattern, $str, $arr));</span><br><span class="line">	var_dump($arr);</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+<p>结果：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">int(<span class="number">3</span>)</span><br><span class="line"><span class="keyword">array</span>(<span class="number">1</span>) &#123;</span><br><span class="line">  [<span class="number">0</span>]=&gt;</span><br><span class="line">  <span class="keyword">array</span>(<span class="number">3</span>) &#123;</span><br><span class="line">    [<span class="number">0</span>]=&gt;</span><br><span class="line">    string(<span class="number">4</span>) <span class="string">"test"</span></span><br><span class="line">    [<span class="number">1</span>]=&gt;</span><br><span class="line">    string(<span class="number">4</span>) <span class="string">"TEST"</span></span><br><span class="line">    [<span class="number">2</span>]=&gt;</span><br><span class="line">    string(<span class="number">4</span>) <span class="string">"tEst"</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><code>m</code>：实现多行匹配，将一串含一个或多个<code>\n</code>符的字符串看成多串字符串处理。使用时必须满足两个条件：一是被搜索的字符串中必须含有<code>\n</code>符，二是正则表达式中必须有<code>^</code>或<code>$</code>符。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">	$pattern=<span class="string">'/^test/m'</span>;<span class="comment">//m实现多行匹配</span></span><br><span class="line">	$str=<span class="string">"teste\ntEST\ntEst"</span>;<span class="comment">//该字符串为被搜索的字符串</span></span><br><span class="line">	var_dump(preg_match_all($pattern, $str, $arr));</span><br><span class="line">	var_dump($arr);</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+<p>结果：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">int(<span class="number">1</span>)</span><br><span class="line"><span class="keyword">array</span>(<span class="number">1</span>) &#123;</span><br><span class="line">  [<span class="number">0</span>]=&gt;</span><br><span class="line">  <span class="keyword">array</span>(<span class="number">1</span>) &#123;</span><br><span class="line">    [<span class="number">0</span>]=&gt;</span><br><span class="line">    string(<span class="number">4</span>) <span class="string">"test"</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><code>s</code>：可实现效果与<code>m</code>一样，该修正符专门与<code>.</code>元字符配合使用，因为有些情况下含<code>.</code>的正则表达式不接受<code>\n</code>符。简单的说，<code>s</code>修正符可以让<code>.</code>元字符匹配所有字符，包括换行符<code>\n</code>。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">	$pattern=<span class="string">'/t.st/s'</span>;<span class="comment">//s修正符可以让`.`元字符匹配所有字符，包括换行符\n</span></span><br><span class="line">	$str=<span class="string">"t\nste\ntEST\ntEst"</span>;<span class="comment">//该字符串为被搜索的字符串</span></span><br><span class="line">	var_dump(preg_match_all($pattern, $str, $arr));</span><br><span class="line">	var_dump($arr);</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+<p>结果：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">int(<span class="number">2</span>)</span><br><span class="line"><span class="keyword">array</span>(<span class="number">1</span>) &#123;</span><br><span class="line">  [<span class="number">0</span>]=&gt;</span><br><span class="line">  <span class="keyword">array</span>(<span class="number">2</span>) &#123;</span><br><span class="line">    [<span class="number">0</span>]=&gt;</span><br><span class="line">    string(<span class="number">4</span>) <span class="string">"t</span></span><br><span class="line"><span class="string">st"</span></span><br><span class="line">    [<span class="number">1</span>]=&gt;</span><br><span class="line">    string(<span class="number">4</span>) <span class="string">"tEst"</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><code>U</code>：禁止贪婪匹配，等价于<code>.*?</code>。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">	$pattern=<span class="string">'/t.*t/U'</span>;<span class="comment">//\d匹配十进制数</span></span><br><span class="line">	$str=<span class="string">"tesstetESt\ntEst"</span>;<span class="comment">//该字符串为被搜索的字符串</span></span><br><span class="line">	var_dump(preg_match_all($pattern, $str, $arr));</span><br><span class="line">	var_dump($arr);</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+<p>结果：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">int(<span class="number">3</span>)</span><br><span class="line"><span class="keyword">array</span>(<span class="number">1</span>) &#123;</span><br><span class="line">  [<span class="number">0</span>]=&gt;</span><br><span class="line">  <span class="keyword">array</span>(<span class="number">3</span>) &#123;</span><br><span class="line">    [<span class="number">0</span>]=&gt;</span><br><span class="line">    string(<span class="number">5</span>) <span class="string">"tesst"</span></span><br><span class="line">    [<span class="number">1</span>]=&gt;</span><br><span class="line">    string(<span class="number">4</span>) <span class="string">"tESt"</span></span><br><span class="line">    [<span class="number">2</span>]=&gt;</span><br><span class="line">    string(<span class="number">4</span>) <span class="string">"tEst"</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>模式修正符可以搭配使用，搭配效果是修正符功能的交集。如<code>Ui</code>是不区分大小写下禁止贪婪匹配。</p>
+</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>&emsp;&emsp;以上内容就是我在本次学习中理解到的正则表达式。正则表达式不是php的产物，在其他语言中也有相同的功能。这里用的是php解释，如果有什么说的不正确或者不足，希望大牛们能提出批评。这是小弟的QQ：2790169047，谢谢大牛。</p>
+<p>参考文献：</p>
+<p><a href="http://www.runoob.com/php/" target="_blank" rel="noopener">http://www.runoob.com/php/</a></p>
+<p><a href="http://www.php.net/manual/zh/function.preg-match.php" target="_blank" rel="noopener">http://www.php.net/manual/zh/function.preg-match.php</a></p>
+<p><a href="http://edu.51cto.com/course/1676.html" target="_blank" rel="noopener">http://edu.51cto.com/course/1676.html</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/12/11/SQLi-LABS-LESS-1-28a绕过姿势小结/" rel="next" title="SQLi-LABS LESS-1~28a绕过姿势小结">
+                <i class="fa fa-chevron-left"></i> SQLi-LABS LESS-1~28a绕过姿势小结
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Water Cloud</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">4</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#PHP正则表达式小结"><span class="nav-number">1.</span> <span class="nav-text">PHP正则表达式小结</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#感悟："><span class="nav-number">1.0.1.</span> <span class="nav-text">感悟：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#正文："><span class="nav-number">1.0.2.</span> <span class="nav-text">正文：</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#正则表达式："><span class="nav-number">1.0.2.1.</span> <span class="nav-text">正则表达式：</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#普通字符："><span class="nav-number">1.0.2.1.1.</span> <span class="nav-text">普通字符：</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#元字符："><span class="nav-number">1.0.2.1.2.</span> <span class="nav-text">元字符：</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#元组字符组合（常见）"><span class="nav-number">1.0.2.1.3.</span> <span class="nav-text">元组字符组合（常见）</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#模式修正符（常见）"><span class="nav-number">1.0.2.1.4.</span> <span class="nav-text">模式修正符（常见）</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#总结"><span class="nav-number">1.0.3.</span> <span class="nav-text">总结</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Water Cloud</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
