@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="前言：&amp;emsp;&amp;emsp;之前去郑州学习的时候看了一套比较系统的XSS注入的视频，简直是要膜拜做这个视频的人，以前会的XSS注入测试跟着一比简直是关公门前耍大刀，不仅刷新了以前对这个注入的理解，还涨了不少姿势。看来以后这种学习大会一定要多去去见识见识，没有什么比这提升更快了我觉得。。。。。。 正文：&amp;emsp;&amp;emsp;刚开始还是先在这里记录一下XSS注入的意义和危害吧： &amp;emsp;&amp;em">
+<meta property="og:type" content="article">
+<meta property="og:title" content="XSS攻击通关之路">
+<meta property="og:url" content="http://yoursite.com/2019/03/16/XSS攻击通关之路/index.html">
+<meta property="og:site_name" content="Water Cloud">
+<meta property="og:description" content="前言：&amp;emsp;&amp;emsp;之前去郑州学习的时候看了一套比较系统的XSS注入的视频，简直是要膜拜做这个视频的人，以前会的XSS注入测试跟着一比简直是关公门前耍大刀，不仅刷新了以前对这个注入的理解，还涨了不少姿势。看来以后这种学习大会一定要多去去见识见识，没有什么比这提升更快了我觉得。。。。。。 正文：&amp;emsp;&amp;emsp;刚开始还是先在这里记录一下XSS注入的意义和危害吧： &amp;emsp;&amp;em">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="http://yoursite.com/2019/03/16/XSS攻击通关之路/level1.png">
+<meta property="og:image" content="http://yoursite.com/2019/03/16/XSS攻击通关之路/level2.png">
+<meta property="og:image" content="http://yoursite.com/2019/03/16/XSS攻击通关之路/level3.png">
+<meta property="og:image" content="http://yoursite.com/2019/03/16/XSS攻击通关之路/level3_real.png">
+<meta property="og:image" content="http://yoursite.com/2019/03/16/XSS攻击通关之路/level5.png">
+<meta property="og:image" content="http://yoursite.com/2019/03/16/XSS攻击通关之路/level8.png">
+<meta property="og:image" content="http://yoursite.com/2019/03/16/XSS攻击通关之路/level11_1.png">
+<meta property="og:image" content="http://yoursite.com/2019/03/16/XSS攻击通关之路/level11.png">
+<meta property="og:image" content="http://yoursite.com/2019/03/16/XSS攻击通关之路/QQ.png">
+<meta property="og:updated_time" content="2019-03-17T12:48:48.560Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="XSS攻击通关之路">
+<meta name="twitter:description" content="前言：&amp;emsp;&amp;emsp;之前去郑州学习的时候看了一套比较系统的XSS注入的视频，简直是要膜拜做这个视频的人，以前会的XSS注入测试跟着一比简直是关公门前耍大刀，不仅刷新了以前对这个注入的理解，还涨了不少姿势。看来以后这种学习大会一定要多去去见识见识，没有什么比这提升更快了我觉得。。。。。。 正文：&amp;emsp;&amp;emsp;刚开始还是先在这里记录一下XSS注入的意义和危害吧： &amp;emsp;&amp;em">
+<meta name="twitter:image" content="http://yoursite.com/2019/03/16/XSS攻击通关之路/level1.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/03/16/XSS攻击通关之路/">
+
+
+
+
+
+  <title>XSS攻击通关之路 | Water Cloud</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Water Cloud</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            About
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-favorite">
+          <a href="/favorite/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heart"></i> <br>
+            
+            favorite
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            Archives
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-schedule">
+          <a href="/schedule/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-calendar"></i> <br>
+            
+            Schedule
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/03/16/XSS攻击通关之路/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Water Cloud">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Water Cloud">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">XSS攻击通关之路</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-03-16T18:17:29+08:00">
+                2019-03-16
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="前言："><a href="#前言：" class="headerlink" title="前言："></a>前言：</h3><p>&emsp;&emsp;之前去郑州学习的时候看了一套比较系统的XSS注入的视频，简直是要膜拜做这个视频的人，以前会的XSS注入测试跟着一比简直是关公门前耍大刀，不仅刷新了以前对这个注入的理解，还涨了不少姿势。看来以后这种学习大会一定要多去去见识见识，没有什么比这提升更快了我觉得。。。。。。</p>
+<h3 id="正文："><a href="#正文：" class="headerlink" title="正文："></a>正文：</h3><p>&emsp;&emsp;刚开始还是先在这里记录一下XSS注入的意义和危害吧：</p>
+<p>&emsp;&emsp;XSS攻击又叫跨站脚本攻击，它是一种经常出现在WEB应用中的计算机安全漏洞，它允许恶意web用户将代码植入到提供给其它用户使用的页面中。比如这些代码包括HTML代码和客户端脚本。主要利用的就是JavaScript，对于hacker来说，XSS就是一种新生的”缓冲区溢出攻击“，而JavaScript就是这个攻击中的ShellCode。这个比喻确实很形象。</p>
+<h5 id="XSS攻击可能产生的危害："><a href="#XSS攻击可能产生的危害：" class="headerlink" title="XSS攻击可能产生的危害："></a>XSS攻击可能产生的危害：</h5><ol>
+<li>盗取各类用户帐号，如机器登录帐号、用户网银帐号、各类管理员帐号</li>
+<li>控制企业数据，包括读取、篡改、添加、删除企业敏感数据的能力</li>
+<li>盗窃企业重要的具有商业价值的资料</li>
+<li>非法转账</li>
+<li>强制发送电子邮件</li>
+<li>网站挂马</li>
+<li>控制受害者机器向其它网站发起攻击</li>
+</ol>
+<h5 id="XSS攻击的分类："><a href="#XSS攻击的分类：" class="headerlink" title="XSS攻击的分类："></a>XSS攻击的分类：</h5><ol>
+<li>DOM型：这是一种hacker和受害用户直接交互的本地利用漏洞，简单说就是hacker给某个特定用户发送了一串含有ShellCode的URL，用户不小心点开该URL，hacker的ShellCode在用户的客户端上被触发执行，利用JavaScript打开一个具有某种漏洞的HTML界面并安装在用户的客户端界面上。</li>
+<li>反射型：这是一种hacker通过第三方服务器与受害用户交互的服务端利用漏洞，简单说就是hacker发现在某个服务端网站上存在反射型的XSS漏洞（也就是客户端的请求数据的响应结果直接经过服务端返回的URL，直接返回给客户端浏览器），伪造一个含有ShellCode的URL，并以服务端的名义发送给用户，用户在点开之后就会触发ShellCode，JavaScript就会将用户的信息传给hacker伪造的站点。</li>
+<li>存储型：这是一个hacker利用服务端数据库窃取用户信息的XSS漏洞，某服务端未完全过滤ShellCode，并允许用户在站点发布和浏览信息，hacker利用这一点将ShellCode存入数据库，站点在解析的时候就会执行该ShellCode，阅读hacker发布信息的用户就有可能被窃取cookie或者其他信息。</li>
+</ol>
+<h5 id="XSS攻击常见利用方式："><a href="#XSS攻击常见利用方式：" class="headerlink" title="XSS攻击常见利用方式："></a>XSS攻击常见利用方式：</h5><p>&emsp;&emsp;接下来使用的都是xss在线训练链接</p>
+<ol>
+<li><p>最简单的就是普通的GET型XSS，这里描述参数不加密的URL：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://test.xss.tv/level1.php?name=&lt;script&gt;alert(/xss/)&lt;/script&gt;</span><br></pre></td></tr></table></figure>
+<p><img src="/2019/03/16/XSS攻击通关之路/level1.png" alt="普通GET型XSS攻击"></p>
+<p>&emsp;&emsp;这是第一关，直接URL参数提交注入，该注入能产生说明程序员没有过滤或用引号包裹任何参数内容，也就是说后台代码直接解析执行参数值。这就造成在弱类型的语言中，原本是正常的字符串被当作代码执行，形成该XSS漏洞。</p>
+</li>
+<li><p>第二种就是带<code>&lt;input&gt;</code>标签的GET型XSS，直接在表单输入窗口直接输入XSS代码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://test.xss.tv/level2.php?keyword=&quot;&gt;&lt;script&gt;alert(/xss/)&lt;/script&gt;</span><br></pre></td></tr></table></figure>
+<p>&emsp;&emsp;这里选择在URL处直接注入代码，带<code>&lt;input&gt;</code>标签的GET型XSS和普通的GET型XSS最大的区别就是普通的GET型XSS的参数可以直接被解析，而带<code>&lt;input&gt;</code>标签的GET型XSS还需要闭合原本的<code>input窗口</code>，然后才能注入ShellCode。闭合点举例：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&lt;form action=level2.php method=GET&gt;</span><br><span class="line">	&lt;input name=keyword  value=&quot;test&quot;&gt;</span><br><span class="line">	&lt;input type=submit name=submit value=&quot;搜索&quot;/&gt;</span><br><span class="line">&lt;/form&gt;</span><br></pre></td></tr></table></figure>
+<p>&emsp;&emsp;这里的keyword参数就是输入框的变量，我们输入的值会在替换value的值，也就是双引号里面的就是keyword变量代表的东西，所以我们闭合这个<code>&lt;input&gt;</code>标签用的是<code>&quot;&gt;</code>，后面就可以跟上ShellCode。放到界面输入框里就是<img src="/2019/03/16/XSS攻击通关之路/level2.png" alt="带input标签的GET型XSS攻击"></p>
+<p>&emsp;&emsp;这个输入框太小，里面的内容有一小部分没显示出来ԅ(¯ㅂ¯ԅ)。。。。。POST型同理，这里就不举例了。</p>
+</li>
+<li><p>第三种就是过滤一些特殊字符：</p>
+<p><img src="/2019/03/16/XSS攻击通关之路/level3.png" alt="level3测试"></p>
+<p>&emsp;&emsp;上面就是通过源码看出的测试字符串，结果的源码如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&lt;form action=level3.php method=GET&gt;</span><br><span class="line">	&lt;input name=keyword  value=&apos;&apos;&amp;gt;&amp;lt;script&amp;gt;alert(/xss/)&amp;lt;/script&amp;gt;&apos;&gt;</span><br><span class="line">	&lt;input type=submit name=submit value=搜索 /&gt;</span><br><span class="line">&lt;/form&gt;</span><br></pre></td></tr></table></figure>
+<p>&emsp;&emsp;可以看出输入的<code>&quot;</code>、<code>&lt;</code>和<code>&gt;</code>都被过滤了，所以带有尖括号的ShellCode就不能用了。所以在此换思路采用事件属性：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://test.xss.tv/level3.php?keyword=&apos;+onclick=&apos;javascript:Aalert(/xss/)&apos;&amp;submit=submit</span><br></pre></td></tr></table></figure>
+<p>&emsp;&emsp;同样的道理，先闭合前一个变量值，在放ShellCode，放到界面输入框就是<img src="/2019/03/16/XSS攻击通关之路/level3_real.png" alt="level3测试"></p>
+<p>&emsp;&emsp;在这里就要注意下，因为上面用的是<code>onclick</code>点击事件，所以还要点击一下输入框才会有弹窗。</p>
+</li>
+<li><p>第四种就是过滤关键字：</p>
+<p>&emsp;&emsp;一般测试的第一反应就是用最常见两中方式，发现特殊字符都被过滤了才会考虑用触发事件，但触发事件的关键字也被过滤了，这时候就要找有哪些还没有被过滤的。关键字测试：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://test.xss.tv/level5.php?keyword=&quot; ONclick=&quot;javascript:alert(/xss/)</span><br></pre></td></tr></table></figure>
+<p>&emsp;&emsp;源代码处可以看到得到的结果是</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&lt;form action=level5.php method=GET&gt;</span><br><span class="line">	&lt;input name=keyword  value=&quot;&quot; o_nclick=&quot;javascript:alert(/xss/)&quot;&gt;</span><br><span class="line">	&lt;input type=submit name=submit value=搜索 /&gt;</span><br><span class="line">&lt;/form&gt;</span><br></pre></td></tr></table></figure>
+<p>&emsp;&emsp;很明显，<code>onclick</code>关键字中间被加了下划线，这种是用双关键字和大小写绕过不了的，那就换一种触发事件，这里可以先考虑超链接</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://test.xss.tv/level5.php?keyword=&quot;&gt;&lt;a href=&quot;javascript:alert(/xss/)&quot;&gt;点这里&lt;/a&gt;//</span><br></pre></td></tr></table></figure>
+<p>&emsp;&emsp;看到的结果就是<img src="/2019/03/16/XSS攻击通关之路/level5.png" alt="level3测试"></p>
+<p>&emsp;&emsp;同样可以成功，后面加了个<code>//</code>的原因是为了注释掉后面多余的部分，以免影响代码的正确性。同样的道理，这一类型的常用利用方法有<code>onclick,onerror,</code>、<code>&lt;a&gt;标签、&lt;img&gt;标签、&lt;svg&gt;标签</code>、<code>双关键字、大小写</code>等不同的多种组合。</p>
+</li>
+<li><p>第五种就是HTML实体编码绕过</p>
+<p>&emsp;&emsp;HTML实体编码指的就是用unicode编码来代替关键字符或关键符号，它有一个很大的特点，那就是<code>&amp;</code>、<code>#</code>、<code>;</code>不能被过滤。具体使用举个例子就一目了然：假设关键字<code>JavaScript</code>被过滤成<code>JavaScrip_t</code>，那就可以用<code>JavaScrip&amp;#x74;</code>来代替<code>JavaScript</code>，这里的括号可以用两个反单引号代替。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://test.xss.tv/level8.php?keyword=javascript:alert(1)</span><br></pre></td></tr></table></figure>
+<p>&emsp;&emsp;这里的关键字<code>javascript</code>被正则表达式加上了下划线：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&lt;form action=level8.php method=GET&gt;</span><br><span class="line">	&lt;input name=keyword  value=&quot;javascript:alert(1)&quot;&gt;</span><br><span class="line">	&lt;input type=submit name=submit value=添加友情链接 /&gt;</span><br><span class="line">&lt;/form&gt;</span><br><span class="line">&lt;center&gt;</span><br><span class="line">	&lt;a href=&quot;javascr_ipt:alert(1)&quot;&gt;友情链接&lt;/a&gt;</span><br><span class="line">	&lt;img src=level8.jpg&gt;</span><br><span class="line">&lt;/center&gt;</span><br></pre></td></tr></table></figure>
+<p>&emsp;&emsp;这个时候HTML实体编码就可以派上用场了：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://test.xss.tv/level8.php?keyword=javascrip&amp;#x74;:alert(/xss/)&amp;submit=%E6%B7%BB%E5%8A%A0%E5%8F%8B%E6%83%85%E9%93%BE%E6%8E%A5</span><br></pre></td></tr></table></figure>
+<p>&emsp;&emsp;这里的submit参数后面的一串URL编码代表的是添加友情链接，界面执行就是<img src="/2019/03/16/XSS攻击通关之路/level8.png" alt="level3测试"></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&lt;form action=level8.php method=GET&gt;</span><br><span class="line">	&lt;input name=keyword  value=&quot;javascrip&amp;amp;#x74;:alert(/xss/)&quot;&gt;</span><br><span class="line">	&lt;input type=submit name=submit value=添加友情链接 /&gt;</span><br><span class="line">&lt;/form&gt;</span><br><span class="line">&lt;center&gt;</span><br><span class="line">    &lt;a href=&quot;javascrip&amp;#x74;:alert(/xss/)&quot;&gt;友情链接&lt;/a&gt;</span><br><span class="line">&lt;/center&gt;</span><br><span class="line">&lt;center&gt;</span><br><span class="line">    &lt;img src=level8.jpg&gt;</span><br><span class="line">&lt;/center&gt;</span><br></pre></td></tr></table></figure>
+<p>&emsp;&emsp;同样的道理，这里需要点击那个友情链接。可以看出，源码不会出现问题，这里的<code>t</code>使用HTML实体编码照样能够被解析成功。这就是HTML实体编码的强大之处，HTML可以识别，执行文件的正则匹配不会成功，从而达到一个绕过的效果。</p>
+<p>&emsp;&emsp;编码绕过的方式还有好多种，比如<code>十六进制编码</code>、<code>jsfuck编码</code>、<code>url编码</code>等，这里不做过多的举例。</p>
+</li>
+<li><p>第六种就是HTTP头流量包注入：</p>
+<p>&emsp;&emsp;这种就是在隐藏HTTP流量存在CSS漏洞的时候就可以抓包修改，流通ShellCode：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&lt;form id=search&gt;</span><br><span class="line">	&lt;input name=&quot;t_link&quot;  value=&quot;&quot; type=&quot;hidden&quot;&gt;</span><br><span class="line">	&lt;input name=&quot;t_history&quot;  value=&quot;&quot; type=&quot;hidden&quot;&gt;</span><br><span class="line">	&lt;input name=&quot;t_sort&quot;  value=&quot;&quot; type=&quot;hidden&quot;&gt;</span><br><span class="line">	&lt;input name=&quot;t_ref&quot;  value=&quot;http://test.xss.tv/level10.php?keyword=well%20done!&amp;t_sort=%22type=%22text%22%20onclick%20=%20%22alert(1)&quot; type=&quot;hidden&quot;&gt;</span><br><span class="line">&lt;/form&gt;</span><br></pre></td></tr></table></figure>
+<p>&emsp;&emsp;可以看出，第四个隐藏的<code>&lt;input&gt;</code>标签里面流通的是<code>t_ref</code>，可以猜测，这个流量包是经过<code>Referer</code>的，所以对其进行抓包，修改Referer参数<img src="/2019/03/16/XSS攻击通关之路/level11_1.png" alt="level3测试"><img src="/2019/03/16/XSS攻击通关之路/level11.png" alt="level3测试"></p>
+<p>&emsp;&emsp;可以看到，这里多出来了一个部分，因为使用的是<code>onmouseover</code>事件，所以只要鼠标经过触碰到，就会触发通过。同样的道理，还可以修改<code>User-Agent</code>、<code>Cookie</code>等一系列HTTP头参数，具体情况具体使用。</p>
+</li>
+</ol>
+<p>&emsp;&emsp;这里一直可以做到第十三关，第十四关好像崩了，进行不下去了。这样这次就做到这里了，以后找机会再往后进行吧，这一次消化的东西有点多了。如果记录的有什么不对，还请表哥表姐们点名批评，批评通道：</p>
+<p><img src="/2019/03/16/XSS攻击通关之路/QQ.png" alt="level3测试"></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/03/15/经典上传漏洞小结/" rel="next" title="经典上传漏洞小结">
+                <i class="fa fa-chevron-left"></i> 经典上传漏洞小结
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Water Cloud</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#前言："><span class="nav-number">1.</span> <span class="nav-text">前言：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#正文："><span class="nav-number">2.</span> <span class="nav-text">正文：</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#XSS攻击可能产生的危害："><span class="nav-number">2.0.1.</span> <span class="nav-text">XSS攻击可能产生的危害：</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#XSS攻击的分类："><span class="nav-number">2.0.2.</span> <span class="nav-text">XSS攻击的分类：</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#XSS攻击常见利用方式："><span class="nav-number">2.0.3.</span> <span class="nav-text">XSS攻击常见利用方式：</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Water Cloud</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
