@@ -1,0 +1,1279 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="前言：&amp;emsp;&amp;emsp;这几天周围的伙伴都在讨论关于zip压缩包的十六进制格式的一些认识，乘着记忆还算热乎，赶紧记录下来，也算是对这方面的一个小归纳。 参考文献： https://www.cnblogs.com/esingchan/p/3958962.html https://pkware.cachefly.net/webdocs/APPNOTE/APPNOTE-6.2.0.txt http">
+<meta property="og:type" content="article">
+<meta property="og:title" content="对zip压缩包通用格式的认识">
+<meta property="og:url" content="http://yoursite.com/2019/04/06/对zip压缩包通用格式的认识/index.html">
+<meta property="og:site_name" content="Water Cloud">
+<meta property="og:description" content="前言：&amp;emsp;&amp;emsp;这几天周围的伙伴都在讨论关于zip压缩包的十六进制格式的一些认识，乘着记忆还算热乎，赶紧记录下来，也算是对这方面的一个小归纳。 参考文献： https://www.cnblogs.com/esingchan/p/3958962.html https://pkware.cachefly.net/webdocs/APPNOTE/APPNOTE-6.2.0.txt http">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="http://yoursite.com/2019/04/06/对zip压缩包通用格式的认识/1.png">
+<meta property="og:image" content="http://yoursite.com/2019/04/06/对zip压缩包通用格式的认识/0.png">
+<meta property="og:image" content="http://yoursite.com/2019/04/06/对zip压缩包通用格式的认识/2.png">
+<meta property="og:image" content="http://yoursite.com/2019/04/06/对zip压缩包通用格式的认识/3.png">
+<meta property="og:image" content="http://yoursite.com/2019/04/06/对zip压缩包通用格式的认识/4.png">
+<meta property="og:image" content="http://yoursite.com/2019/04/06/对zip压缩包通用格式的认识/5.png">
+<meta property="og:image" content="http://yoursite.com/2019/04/06/对zip压缩包通用格式的认识/6.png">
+<meta property="og:image" content="http://yoursite.com/2019/04/06/对zip压缩包通用格式的认识/7.png">
+<meta property="og:image" content="http://yoursite.com/2019/04/06/对zip压缩包通用格式的认识/QQ.png">
+<meta property="og:updated_time" content="2019-04-17T08:29:04.376Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="对zip压缩包通用格式的认识">
+<meta name="twitter:description" content="前言：&amp;emsp;&amp;emsp;这几天周围的伙伴都在讨论关于zip压缩包的十六进制格式的一些认识，乘着记忆还算热乎，赶紧记录下来，也算是对这方面的一个小归纳。 参考文献： https://www.cnblogs.com/esingchan/p/3958962.html https://pkware.cachefly.net/webdocs/APPNOTE/APPNOTE-6.2.0.txt http">
+<meta name="twitter:image" content="http://yoursite.com/2019/04/06/对zip压缩包通用格式的认识/1.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/04/06/对zip压缩包通用格式的认识/">
+
+
+
+
+
+  <title>对zip压缩包通用格式的认识 | Water Cloud</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Water Cloud</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            About
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-favorite">
+          <a href="/favorite/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heart"></i> <br>
+            
+            favorite
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            Archives
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-schedule">
+          <a href="/schedule/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-calendar"></i> <br>
+            
+            Schedule
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/04/06/对zip压缩包通用格式的认识/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Water Cloud">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Water Cloud">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">对zip压缩包通用格式的认识</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-04-06T16:37:29+08:00">
+                2019-04-06
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="前言："><a href="#前言：" class="headerlink" title="前言："></a>前言：</h1><p>&emsp;&emsp;这几天周围的伙伴都在讨论关于zip压缩包的十六进制格式的一些认识，乘着记忆还算热乎，赶紧记录下来，也算是对这方面的一个小归纳。</p>
+<p>参考文献：</p>
+<p><a href="https://www.cnblogs.com/esingchan/p/3958962.html" target="_blank" rel="noopener">https://www.cnblogs.com/esingchan/p/3958962.html</a></p>
+<p><a href="https://pkware.cachefly.net/webdocs/APPNOTE/APPNOTE-6.2.0.txt" target="_blank" rel="noopener">https://pkware.cachefly.net/webdocs/APPNOTE/APPNOTE-6.2.0.txt</a></p>
+<p><a href="https://xz.aliyun.com/t/3994" target="_blank" rel="noopener">https://xz.aliyun.com/t/3994</a></p>
+<h1 id="正文："><a href="#正文：" class="headerlink" title="正文："></a>正文：</h1><p>&emsp;&emsp;还要啰嗦一句：压缩可以分为有损压缩和无损压缩。从名字中就可以看出，有损压缩就是无法将原始的信息完整的保存下来，这就造成解压的时候有一部分信息会被损坏，但它的压缩率高啊，jpg文件就是一种有损压缩，所以一般jpg文件会比png图片模糊，但文件大小会小一点；反之，无损压缩可以完整的保存原始信息，zip就是其中之一，此外还有GZIP，RAR，PNG，GIF等格式的文件也是无损压缩。这里重点记录zip文件格式解析。</p>
+<p>&emsp;&emsp;这里先展示一波从<a href="https://en.wikipedia.org/wiki/Zip_(file_format" target="_blank" rel="noopener">网上</a>)抓来的表格：</p>
+<h5 id="文件头实体（0x504B0304）："><a href="#文件头实体（0x504B0304）：" class="headerlink" title="文件头实体（0x504B0304）："></a>文件头实体（0x504B0304）：</h5><table>
+<thead>
+<tr>
+<th>偏移</th>
+<th>字节数</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>4</td>
+<td>固定值0x04034b50</td>
+</tr>
+<tr>
+<td>4</td>
+<td>2</td>
+<td>解压缩所需pkware最低版本</td>
+</tr>
+<tr>
+<td>6</td>
+<td>2</td>
+<td>通用比特标志</td>
+</tr>
+<tr>
+<td>8</td>
+<td>2</td>
+<td>压缩方式</td>
+</tr>
+<tr>
+<td>10</td>
+<td>2</td>
+<td>文件最后修改时间</td>
+</tr>
+<tr>
+<td>12</td>
+<td>2</td>
+<td>文件最后修改日期</td>
+</tr>
+<tr>
+<td>14</td>
+<td>4</td>
+<td>CRC-32校验</td>
+</tr>
+<tr>
+<td>18</td>
+<td>4</td>
+<td>压缩后大小</td>
+</tr>
+<tr>
+<td>22</td>
+<td>4</td>
+<td>压缩前大小</td>
+</tr>
+<tr>
+<td>26</td>
+<td>2</td>
+<td>文件名称长度</td>
+</tr>
+<tr>
+<td>28</td>
+<td>2</td>
+<td>文件注释长度</td>
+</tr>
+</tbody>
+</table>
+<h5 id="压缩数据描述符（0x504B0708）："><a href="#压缩数据描述符（0x504B0708）：" class="headerlink" title="压缩数据描述符（0x504B0708）："></a>压缩数据描述符（0x504B0708）：</h5><table>
+<thead>
+<tr>
+<th>偏移</th>
+<th>字节数</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>0/4</td>
+<td>固定值0x08074b50</td>
+</tr>
+<tr>
+<td>0/4</td>
+<td>4</td>
+<td>CRC-32校验</td>
+</tr>
+<tr>
+<td>4/8</td>
+<td>4</td>
+<td>压缩后大小</td>
+</tr>
+<tr>
+<td>8/12</td>
+<td>4</td>
+<td>压缩前大小</td>
+</tr>
+</tbody>
+</table>
+<h5 id="压缩内容信息块（0x504B0102）："><a href="#压缩内容信息块（0x504B0102）：" class="headerlink" title="压缩内容信息块（0x504B0102）："></a>压缩内容信息块（0x504B0102）：</h5><table>
+<thead>
+<tr>
+<th>偏移</th>
+<th>字节数</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>4</td>
+<td>固定值0x02014b50</td>
+</tr>
+<tr>
+<td>4</td>
+<td>2</td>
+<td>压缩版本</td>
+</tr>
+<tr>
+<td>6</td>
+<td>2</td>
+<td>解压缩所需pkware最低版本</td>
+</tr>
+<tr>
+<td>8</td>
+<td>2</td>
+<td>标志</td>
+</tr>
+<tr>
+<td>10</td>
+<td>2</td>
+<td>压缩方式</td>
+</tr>
+<tr>
+<td>12</td>
+<td>2</td>
+<td>文件最后修改时间</td>
+</tr>
+<tr>
+<td>14</td>
+<td>2</td>
+<td>文件最后修改日期</td>
+</tr>
+<tr>
+<td>16</td>
+<td>4</td>
+<td>CRC-32校验</td>
+</tr>
+<tr>
+<td>20</td>
+<td>4</td>
+<td>压缩后大小</td>
+</tr>
+<tr>
+<td>24</td>
+<td>4</td>
+<td>压缩前大小</td>
+</tr>
+<tr>
+<td>28</td>
+<td>2</td>
+<td>文件名称长度(n)</td>
+</tr>
+<tr>
+<td>30</td>
+<td>2</td>
+<td>扩展字段长度(m)</td>
+</tr>
+<tr>
+<td>32</td>
+<td>2</td>
+<td>文件注释长度(k)</td>
+</tr>
+<tr>
+<td>34</td>
+<td>2</td>
+<td>文件开始的分卷号</td>
+</tr>
+<tr>
+<td>36</td>
+<td>2</td>
+<td>文件内部属性</td>
+</tr>
+<tr>
+<td>38</td>
+<td>4</td>
+<td>文件外部属性</td>
+</tr>
+<tr>
+<td>42</td>
+<td>4</td>
+<td>对应文件实体在文件中的偏移</td>
+</tr>
+<tr>
+<td>46</td>
+<td>n</td>
+<td>文件名称</td>
+</tr>
+<tr>
+<td>46+n</td>
+<td>m</td>
+<td>扩展字段</td>
+</tr>
+<tr>
+<td>46+n+m</td>
+<td>k</td>
+<td>文件注释</td>
+</tr>
+</tbody>
+</table>
+<p>主文件结束描述数据块（0x504B0506）：</p>
+<table>
+<thead>
+<tr>
+<th>偏移</th>
+<th>字节数</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>4</td>
+<td>固定值0x06054b50</td>
+</tr>
+<tr>
+<td>4</td>
+<td>2</td>
+<td>当前分卷号</td>
+</tr>
+<tr>
+<td>6</td>
+<td>2</td>
+<td>Central Directory的开始分卷号</td>
+</tr>
+<tr>
+<td>8</td>
+<td>2</td>
+<td>当前分卷Central Directory的记录数量</td>
+</tr>
+<tr>
+<td>10</td>
+<td>2</td>
+<td>Central Directory的总记录数量</td>
+</tr>
+<tr>
+<td>12</td>
+<td>4</td>
+<td>Central Directory的大小 (bytes)</td>
+</tr>
+<tr>
+<td>16</td>
+<td>4</td>
+<td>Central Directory的开始位置偏移</td>
+</tr>
+<tr>
+<td>20</td>
+<td>2</td>
+<td>Zip文件注释长度(n)</td>
+</tr>
+<tr>
+<td>22</td>
+<td>n</td>
+<td>Zip文件注释</td>
+</tr>
+</tbody>
+</table>
+<h3 id="正文-gt-解释："><a href="#正文-gt-解释：" class="headerlink" title="正文-&gt;解释："></a>正文-&gt;解释：</h3><p>&emsp;&emsp;有了上面的表格，这里的解释就可以更形象一点，从上面的表格可以看出，具体的zip文件格式模块可以分成4大块：</p>
+<ol>
+<li>文件头实体（0x504B0304）：必选模块，记录被压缩的的每一个文件的文件头信息，文件数据信息，以及数据描述信息，主要部分便是上述表格内容。与核心压缩内容块对应，压缩包中包含几个文件，就有几个<code>0x504B0304</code>模块。</li>
+<li>压缩数据描述符（0x504B0708）：可选模块，用于在不能对输出的 ZIP 文件进行检索（如磁带机）时使用。只有在相应的local file header中通用标记字段的第３bit设为１时才会出现，跟在每一个文件头模块的后面。</li>
+<li>核心压缩数据目录（0x504B0102）：必选模块，记录被压缩文件的具体数据，一部分与文件头模块对应，一部分为文件内容的偏移模块，压缩内容寻址方式就是在这里记录的。该模块的一些标识信息对应文件头模块的信息，下面会做具体解释。</li>
+<li>目录结束标识符（0x504B0506）：必选模块，用于标记压缩的目录数据的结束，每一个压缩文件只有一个目录结束标识符，记录压缩包的简介信息以及文件读取等。</li>
+</ol>
+<p>&emsp;这里用一张图来描述：<img src="/2019/04/06/对zip压缩包通用格式的认识/1.png" alt="p1"></p>
+<p>&emsp;&emsp;local header指的就是文件头，统称为file header，由central directory（也就是核心目录）控制着偏移位置。而且计算机也是通过读核心目录的个数来确定文件实体的个数和文件内容的具体信息，这就注定了在一个压缩文件中，有一个0x504B0102就有一个0x504B0304。而核心目录的偏移地址和大小由目录结束标识符来确定。此外，这里强调一下，在hex编辑器里面，排在后面的字节是高位字节，排在前面的字节是低位字节。</p>
+<h5 id="实例分析："><a href="#实例分析：" class="headerlink" title="实例分析："></a>实例分析：</h5><p>&emsp;&emsp;先看一下样本压缩包的总体可视化框架的格式：</p>
+<h5 id=""><a href="#" class="headerlink" title=""></a><img src="/2019/04/06/对zip压缩包通用格式的认识/0.png" alt="p0"></h5><p>&emsp;&emsp;OK，懂了这些的话，对于其中具体的分析就能有一个大架构的认识。这里再对每一个大模块里面的具体内容做一个大致的实例分析，第一大块部分：<img src="/2019/04/06/对zip压缩包通用格式的认识/2.png" alt="p2"></p>
+<p>这是一张zip压缩包最前面部分的截图，可以看出这个是文件头实体，解释如下：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">16进制码</th>
+<th style="text-align:center">十进制码</th>
+<th style="text-align:center">解释</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">0x04034B50</td>
+<td style="text-align:center">67324752</td>
+<td style="text-align:center">十进制码没有特殊意义，这里表示PK文件模块，是每一个文件头实体的标识符开始，后面标注部分的一连串字节描述文件部分简介信息。</td>
+</tr>
+<tr>
+<td style="text-align:center">0x0014</td>
+<td style="text-align:center">20</td>
+<td style="text-align:center">表示解压该文件的pkware（该公司的数据压缩库）的最低版本是2.0。</td>
+</tr>
+<tr>
+<td style="text-align:center">0x0000</td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">表示该文件只能在支持输出zip的设备机上使用，如果是0x1000时才是代表该文件可以在无法检索zip文件信息的设备上读入。</td>
+</tr>
+<tr>
+<td style="text-align:center">0x0008</td>
+<td style="text-align:center">8</td>
+<td style="text-align:center">这两位位是加密方式，有无加密，哪种加密方式都是在此记录。</td>
+</tr>
+<tr>
+<td style="text-align:center">0xAB6D</td>
+<td style="text-align:center">43885</td>
+<td style="text-align:center">文件最后修改时间（这里是标准的MS-DOS时间日，因为该程序是在MS-DOS上发明的）。</td>
+</tr>
+<tr>
+<td style="text-align:center">0x4E74</td>
+<td style="text-align:center">20084</td>
+<td style="text-align:center">文件最后修改日期（这里是标准的MS-DOS时间日，因为该程序是在MS-DOS上发明的）。</td>
+</tr>
+<tr>
+<td style="text-align:center">0x4FB0B314</td>
+<td style="text-align:center">1336980244</td>
+<td style="text-align:center">crc32校验码（也就是循环冗余校验码），用于判断传输的文件是否完整，对于两个文件来说，crc32校验码出现相同的概率实在是太小了，所以一个crc32基本只能标识一个文件。产生crc32的算法是David Schwadeter的CRC-32算法。</td>
+</tr>
+<tr>
+<td style="text-align:center">0x00002556</td>
+<td style="text-align:center">9558</td>
+<td style="text-align:center">十进制码代表该文件在压缩包中被压缩后的大小（单位是比特）。</td>
+</tr>
+<tr>
+<td style="text-align:center">0x0000261B</td>
+<td style="text-align:center">9755</td>
+<td style="text-align:center">十进制码代表该文件在压缩包中被压缩前的大小（单位是比特）。</td>
+</tr>
+<tr>
+<td style="text-align:center">0x0019</td>
+<td style="text-align:center">25</td>
+<td style="text-align:center">十进制码代表文件名称的长度是25比特长，也就是16进制的25个字节，16进制两个字符算一个字节。</td>
+</tr>
+<tr>
+<td style="text-align:center">0x0000</td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">十进制码表示文件注释内容的长度是0比特字节，也就是16进制的0个字节长度，16进制两个字符算一个字节。</td>
+</tr>
+</tbody>
+</table>
+<p>&emsp;&emsp;后面跟着的就是一些不定字节的数据信息，比如水蜜桃红部分的就是该文件头信息所解释的文件的文件名信息，以及文件内部的实体内容信息。<img src="/2019/04/06/对zip压缩包通用格式的认识/3.png" alt="p3"></p>
+<p>&emsp;&emsp;上面这张图就是压缩包的部分可视化简介内容，水蜜桃红部分的信息<code>0xD0C2BDA8CEC4BCFEBCD02F62 6C696E67626C696E672E7A6970</code>就是文件名称<code>blingbling.zip</code>的意思；同样的道理，大小和存储大小分别指该文件在被压缩前和被压缩后文件大小（单位是比特）；创建时间就是上面的文件最后修改时间和修改日期组合且格式化输出的显示，跟在后面的内容也就是该文件的实体内容信息了。</p>
+<p>&emsp;&emsp;如果压缩文件可以被不能检索zip压缩包的设备上读入的话，再每一个文件头实体后面都会再跟着一个压缩数据描述模块，包含固定描述符，crc32校验码，文件压缩前大小和文件压缩后大小四个部分。通俗来看，就是将实体文件头的部分信息重新提取并整理成一个单独的模块：<img src="/2019/04/06/对zip压缩包通用格式的认识/4.png" alt="p4"></p>
+<p>由蓝色背景显示的部分就是一个例子，</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">十六进制码</th>
+<th style="text-align:center">十进制码</th>
+<th style="text-align:center">解释</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">0x08074B50</td>
+<td style="text-align:center">134695760</td>
+<td style="text-align:center">十进制码没有意义，这里表示PK文件模块——数据描述模块的开始，用于描述该文件的最主要解释数据，即后面跟着的数据信息。</td>
+</tr>
+<tr>
+<td style="text-align:center">0x4FB0B314</td>
+<td style="text-align:center">1336980244</td>
+<td style="text-align:center">crc32校验码（也就是循环冗余校验码），用于判断传输的文件是否完整，对于两个文件来说，crc32校验码出现相同的概率实在是太小了，所以一个crc32基本只能标识一个文件。产生crc32的算法是David Schwadeter的CRC-32算法。</td>
+</tr>
+<tr>
+<td style="text-align:center">0x00002556</td>
+<td style="text-align:center">9558</td>
+<td style="text-align:center">十进制码代表该文件在压缩包中被压缩后的大小（单位是比特）。</td>
+</tr>
+<tr>
+<td style="text-align:center">0x0000261B</td>
+<td style="text-align:center">9755</td>
+<td style="text-align:center">十进制码代表该文件在压缩包中被压缩前的大小（单位是比特）。</td>
+</tr>
+</tbody>
+</table>
+<p>&emsp;&emsp;模块后面可能还会跟着其他冗余信息，这里是没有。接下来跟着的模块就是下一个文件头实体的信息和文件描述信息，通俗说就是下一个压缩文件的信息，模块各数据的含义与上面举例的模块信息相同，这里不一一举例。所有的文件头实体模块和数据描述模块读完之后，就是文件目录模块。</p>
+<p>&emsp;&emsp;文件目录模块，顾名思义，就是一个与目录作用相仿的模块信息，主要是记录文件完整简介的模块，以及该文件实体内容的读取方式等，类似于记录这张截图：</p>
+<p><img src="/2019/04/06/对zip压缩包通用格式的认识/5.png" alt="p5"></p>
+<p>&emsp;&emsp;可以说这张可视化的图在文件目录板块都可以找到对应的信息：<img src="/2019/04/06/对zip压缩包通用格式的认识/6.png" alt="p6"></p>
+<p>该文件实体的中心核心目录块的具体解释如下：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">十六进制码</th>
+<th style="text-align:center">十进制码</th>
+<th style="text-align:center">解释</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">0x02014B05</td>
+<td style="text-align:center">33639173</td>
+<td style="text-align:center">十进制码没有特殊意义，这里表示PK文件模块——中心文件目录模块的开始，主要记录相对应目录的文件的具体简介信息，以及文件实体内容的读取方式。</td>
+</tr>
+<tr>
+<td style="text-align:center">0x003F</td>
+<td style="text-align:center">63</td>
+<td style="text-align:center">表示解压该文件的pkware（该公司的数据压缩库）的版本是6.3。</td>
+</tr>
+<tr>
+<td style="text-align:center">0x0014</td>
+<td style="text-align:center">20</td>
+<td style="text-align:center">表示解压该文件的pkware（该公司的数据压缩库）的最低版本是2.0。</td>
+</tr>
+<tr>
+<td style="text-align:center">0x0000</td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">表示该文件只能在支持输出zip的设备机上使用，如果是0x1000时才是代表该文件可以在无法检索zip文件信息的设备上读入。</td>
+</tr>
+<tr>
+<td style="text-align:center">0x0008</td>
+<td style="text-align:center">8</td>
+<td style="text-align:center">这两位位是加密方式，有无加密，哪种加密方式都是在此记录。</td>
+</tr>
+<tr>
+<td style="text-align:center">0xAB6D</td>
+<td style="text-align:center">43885</td>
+<td style="text-align:center">文件最后修改时间（这里是标准的MS-DOS时间日，因为该程序是在MS-DOS上发明的）。</td>
+</tr>
+<tr>
+<td style="text-align:center">0x4E74</td>
+<td style="text-align:center">20084</td>
+<td style="text-align:center">文件最后修改日期（这里是标准的MS-DOS时间日，因为该程序是在MS-DOS上发明的）。</td>
+</tr>
+<tr>
+<td style="text-align:center">0x4FB0B314</td>
+<td style="text-align:center">1336980244</td>
+<td style="text-align:center">crc32校验码（也就是循环冗余校验码），用于判断传输的文件是否完整，对于两个文件来说，crc32校验码出现相同的概率实在是太小了，所以一个crc32基本只能标识一个文件。产生crc32的算法是David Schwadeter的CRC-32算法。</td>
+</tr>
+<tr>
+<td style="text-align:center">0x00002556</td>
+<td style="text-align:center">9558</td>
+<td style="text-align:center">十进制码代表该文件在压缩包中被压缩后的大小（单位是比特）。</td>
+</tr>
+<tr>
+<td style="text-align:center">0x0000261B</td>
+<td style="text-align:center">9755</td>
+<td style="text-align:center">十进制码代表该文件在压缩包中被压缩前的大小（单位是比特）。</td>
+</tr>
+<tr>
+<td style="text-align:center">0x0019</td>
+<td style="text-align:center">25</td>
+<td style="text-align:center">十进制码代表文件名称的长度是25比特长，也就是16进制的25个字节，16进制两个字符算一个字节。</td>
+</tr>
+<tr>
+<td style="text-align:center">0x0024</td>
+<td style="text-align:center">36</td>
+<td style="text-align:center">十进制码表示文件扩展字段的长度是36比特长，也就是16进制的36个字节，16进制两个字符算一个字节。</td>
+</tr>
+<tr>
+<td style="text-align:center">0x0000</td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">十进制码表示文件注释内容的长度是0比特字节，也就是16进制的0个字节长度，16进制两个字符算一个字节。</td>
+</tr>
+<tr>
+<td style="text-align:center">0x0000</td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">表示文件在磁盘中起始位置的号码，也是磁盘在读入该文件的时候开始解析的位置。</td>
+</tr>
+<tr>
+<td style="text-align:center">0x0000</td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">用来表示该文本的数据类型，如果是0x0001，则代表该文本是ASC文本数据类型，否则是二进制数据类型。这里只用到最低位，其他做为补齐字节长度存在，为0。</td>
+</tr>
+<tr>
+<td style="text-align:center">0x00000020</td>
+<td style="text-align:center">32</td>
+<td style="text-align:center">用来表示文件外部属性，既该文件可以依赖的主机操作系统。</td>
+</tr>
+<tr>
+<td style="text-align:center">0x00000000</td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">用来表示与该中心目录模块相对应的文件头实体在压缩包文件中的偏移地址。这里是0，即对应的0x504B0102是最前面的。</td>
+</tr>
+<tr>
+<td style="text-align:center">0x+n</td>
+<td style="text-align:center">略</td>
+<td style="text-align:center">表示文件名称，这里的n具体的值为25，从上面可以算出来。</td>
+</tr>
+<tr>
+<td style="text-align:center">0x+n+m</td>
+<td style="text-align:center">略</td>
+<td style="text-align:center">表示文件扩展字段，这里的n具体的值为25，m具体的值为36，从上面可以算出来。</td>
+</tr>
+<tr>
+<td style="text-align:center">0x+m+n+k</td>
+<td style="text-align:center">略</td>
+<td style="text-align:center">表示文件注释内容，这里的n具体的值为25，m具体的值为36，k具体的值为0，从上面可以算出来。</td>
+</tr>
+</tbody>
+</table>
+<p>&emsp;&emsp;中央核心目录模块可以说是索引并区分实体文件内容的钥匙，文件头实体部分的简介内容在核心目录模块中都有对应。同时，有一个<code>0x504B0102</code>就会有一个<code>0x504B0304</code>，而且中央核心目录模块的内容直接影响到对应文件的属性，比如该模块的压缩方式可以直接决定文件是否加密，以何种方式加密等等。这里还有句题外话：这些信息都是zip压缩包必定自带的数据，也就是说压缩后的数据大小比压缩前的数据大小大，算法会选择不对数据进行压缩。</p>
+<p>&emsp;&emsp;解释这么多的模块，还有一个关键问题：多个文件数据混淆在一个压缩文件中，压缩包又是怎么区分并读取这些文件的？这就牵扯到zip压缩包解析格式的最后一个模块——核心目录结束标志模块：<img src="/2019/04/06/对zip压缩包通用格式的认识/7.png" alt="p7"></p>
+<p>核心目录结束标志模块像是一个大的总结，一个压缩文件中只会有一个：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">十六进制码</th>
+<th style="text-align:center">十进制码</th>
+<th style="text-align:center">解释</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">0x06054B50</td>
+<td style="text-align:center">101010256</td>
+<td style="text-align:center">十进制值没有意义，这里用作pk文件目录结束说明，zip文件也是从此处开始读取各文件大致描述的。</td>
+</tr>
+<tr>
+<td style="text-align:center">0x0000</td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">处理文件的磁盘号，主要的是做核心目录结束记录。</td>
+</tr>
+<tr>
+<td style="text-align:center">0x0000</td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">核心目录在磁盘中的起始号，记录第一个核心目录起始位置。</td>
+</tr>
+<tr>
+<td style="text-align:center">0x0003</td>
+<td style="text-align:center">3</td>
+<td style="text-align:center">记录压缩文件中核心目录的总个数（这里是在磁盘中的）。</td>
+</tr>
+<tr>
+<td style="text-align:center">0x0003</td>
+<td style="text-align:center">3</td>
+<td style="text-align:center">记录压缩文件中核心目录的总个数（这里是指zip文件中的）。</td>
+</tr>
+<tr>
+<td style="text-align:center">0x0000012D</td>
+<td style="text-align:center">301</td>
+<td style="text-align:center">十进制码表示所有核心目录模块在zip文件中所占的字节格式，也就是301个字节，对应16进制的602个字符，十六进制下两个字符算一个字节。</td>
+</tr>
+<tr>
+<td style="text-align:center">0x0000260E</td>
+<td style="text-align:center">9742</td>
+<td style="text-align:center">十进制码表示第一个核心目录模块的初始位置在文件中的偏移位置。这里就是指第一个核心目录模块的从文件的第9743个字节开始。</td>
+</tr>
+<tr>
+<td style="text-align:center">0x0000</td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">十进制码表示zip文件的注释字段长度。</td>
+</tr>
+<tr>
+<td style="text-align:center">0x+k</td>
+<td style="text-align:center">略</td>
+<td style="text-align:center">这里的k即为上一行的十进制码的值，内容就是zip文件的注释部分在压缩后的内容。</td>
+</tr>
+</tbody>
+</table>
+<p>&emsp;&emsp;这个核心目录结束模块数据不多，确是zip文件读取的入口。一般都是先找到核心目录结束符，通过里面的核心目录个数和首个核心目录偏移位置找到这个核心目录模块，在根据里面的对应实体文件所在偏移位置读取实体文件，便可以还原一个压缩文件。而这其中一些相同的数据模块也不是冗余数据，是用来判断文件所属，关键的地方对应不上便会造成压缩文件损坏而不可读取。</p>
+<hr>
+<h1 id="总结："><a href="#总结：" class="headerlink" title="总结："></a>总结：</h1><p>&emsp;&emsp;上面描述的zip文件是以pkzip作为模版的，一些属性问题都与pkware公司当初在开发pkzip时的环境和规定有关，详情可以参见pkware公司出留下的开发手册。总的来说，zip文件格式分为不定量个核心文件目录模块和等量的文件头实体模块（条件成立下还可能存在等量的数据描述符模块），以及一个核心目录结束标志模块，通过Roger Schlafiy提供的加密算法进行加密，以树形结构解析文件，将数据压缩到同一个文件下。</p>
+<p>&emsp;&emsp;上述内容来自我个人在查阅资料后的个人理解，如果有什么不正确的地方还请及时骚扰批评我：</p>
+<p><img src="/2019/04/06/对zip压缩包通用格式的认识/QQ.png" alt="p8"></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/03/30/linux中通配符的初步认识/" rel="next" title="linux中通配符的初步认识">
+                <i class="fa fa-chevron-left"></i> linux中通配符的初步认识
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Water Cloud</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">8</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#前言："><span class="nav-number">1.</span> <span class="nav-text">前言：</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#正文："><span class="nav-number">2.</span> <span class="nav-text">正文：</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#文件头实体（0x504B0304）："><span class="nav-number">2.0.0.0.1.</span> <span class="nav-text">文件头实体（0x504B0304）：</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#压缩数据描述符（0x504B0708）："><span class="nav-number">2.0.0.0.2.</span> <span class="nav-text">压缩数据描述符（0x504B0708）：</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#压缩内容信息块（0x504B0102）："><span class="nav-number">2.0.0.0.3.</span> <span class="nav-text">压缩内容信息块（0x504B0102）：</span></a></li></ol></li></ol><li class="nav-item nav-level-3"><a class="nav-link" href="#正文-gt-解释："><span class="nav-number">2.0.1.</span> <span class="nav-text">正文-&gt;解释：</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#实例分析："><span class="nav-number">2.0.1.0.1.</span> <span class="nav-text">实例分析：</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#"><span class="nav-number">2.0.1.0.2.</span> <span class="nav-text"></span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#总结："><span class="nav-number">3.</span> <span class="nav-text">总结：</span></a></li></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Water Cloud</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
