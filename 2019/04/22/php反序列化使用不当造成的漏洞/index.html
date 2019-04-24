@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="前言：&amp;emsp;&amp;emsp;这几天进入了一个疯狂的划水期，作为一个十成十的菜鸟，跟着学长们见识一下CTF的乐趣所在，还真别说，真香。。。。原本是决定借这一次提高一下自己，结果被虐得体无完肤，特别是WEB方面，反序列化这一块就让我很难受，所以准备写这一篇博客纪念一下自己的菜。。。。。 参考文献：Amber小姐姐的讲解视频 正文：&amp;emsp;&amp;emsp;献上一波自己对序列化和反序列化的理解：php中">
+<meta property="og:type" content="article">
+<meta property="og:title" content="php反序列化使用不当造成的漏洞">
+<meta property="og:url" content="http://yoursite.com/2019/04/22/php反序列化使用不当造成的漏洞/index.html">
+<meta property="og:site_name" content="Water Cloud">
+<meta property="og:description" content="前言：&amp;emsp;&amp;emsp;这几天进入了一个疯狂的划水期，作为一个十成十的菜鸟，跟着学长们见识一下CTF的乐趣所在，还真别说，真香。。。。原本是决定借这一次提高一下自己，结果被虐得体无完肤，特别是WEB方面，反序列化这一块就让我很难受，所以准备写这一篇博客纪念一下自己的菜。。。。。 参考文献：Amber小姐姐的讲解视频 正文：&amp;emsp;&amp;emsp;献上一波自己对序列化和反序列化的理解：php中">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="http://yoursite.com/2019/04/22/php反序列化使用不当造成的漏洞/1.png">
+<meta property="og:image" content="http://yoursite.com/2019/04/22/php反序列化使用不当造成的漏洞/2.png">
+<meta property="og:image" content="http://yoursite.com/2019/04/22/php反序列化使用不当造成的漏洞/3.png">
+<meta property="og:image" content="http://yoursite.com/2019/04/22/php反序列化使用不当造成的漏洞/4.png">
+<meta property="og:image" content="http://yoursite.com/2019/04/22/php反序列化使用不当造成的漏洞/5.png">
+<meta property="og:image" content="http://yoursite.com/2019/04/22/php反序列化使用不当造成的漏洞/6.png">
+<meta property="og:image" content="http://yoursite.com/2019/04/22/php反序列化使用不当造成的漏洞/7.png">
+<meta property="og:image" content="http://yoursite.com/2019/04/22/php反序列化使用不当造成的漏洞/8.png">
+<meta property="og:image" content="http://yoursite.com/2019/04/22/php反序列化使用不当造成的漏洞/QQ.png">
+<meta property="og:updated_time" content="2019-04-24T16:35:58.841Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="php反序列化使用不当造成的漏洞">
+<meta name="twitter:description" content="前言：&amp;emsp;&amp;emsp;这几天进入了一个疯狂的划水期，作为一个十成十的菜鸟，跟着学长们见识一下CTF的乐趣所在，还真别说，真香。。。。原本是决定借这一次提高一下自己，结果被虐得体无完肤，特别是WEB方面，反序列化这一块就让我很难受，所以准备写这一篇博客纪念一下自己的菜。。。。。 参考文献：Amber小姐姐的讲解视频 正文：&amp;emsp;&amp;emsp;献上一波自己对序列化和反序列化的理解：php中">
+<meta name="twitter:image" content="http://yoursite.com/2019/04/22/php反序列化使用不当造成的漏洞/1.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/04/22/php反序列化使用不当造成的漏洞/">
+
+
+
+
+
+  <title>php反序列化使用不当造成的漏洞 | Water Cloud</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Water Cloud</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            About
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-favorite">
+          <a href="/favorite/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heart"></i> <br>
+            
+            favorite
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            Archives
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-schedule">
+          <a href="/schedule/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-calendar"></i> <br>
+            
+            Schedule
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/04/22/php反序列化使用不当造成的漏洞/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Water Cloud">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Water Cloud">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">php反序列化使用不当造成的漏洞</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-04-22T20:31:49+08:00">
+                2019-04-22
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="前言："><a href="#前言：" class="headerlink" title="前言："></a>前言：</h1><p>&emsp;&emsp;这几天进入了一个疯狂的划水期，作为一个十成十的菜鸟，跟着学长们见识一下CTF的乐趣所在，还真别说，真香。。。。原本是决定借这一次提高一下自己，结果被虐得体无完肤，特别是WEB方面，反序列化这一块就让我很难受，所以准备写这一篇博客纪念一下自己的菜。。。。。</p>
+<p>参考文献：<a href="https://www.bilibili.com/video/av41677248?from=search&amp;seid=16309505071500820353" target="_blank" rel="noopener">Amber小姐姐的讲解视频</a></p>
+<h2 id="正文："><a href="#正文：" class="headerlink" title="正文："></a>正文：</h2><p>&emsp;&emsp;献上一波自己对序列化和反序列化的理解：php中，序列化就是将一个类的对象转换成一个有一定序列格式的字符串，反之，反序列化就是将这一串有一定序列格式的字符串转换成一个类的对象的过程。其中，php中序列化对应的原型函数为<code>string serialize ( mixed $value )</code>，反序列化对应的原型函数为<code>string unserialize ( mixed $value )</code>。</p>
+<p>ps：对于一个类来说，它的对象可以有该类的属性和方法，但序列化的字符串只记录该对象的属性及属性值。可能在这里有点 抽象，不过下面的例子会有更详细的解释。</p>
+<p>这里先做一个序列化和反序列化的实例演示（手写的，有点挫劣）：<img src="/2019/04/22/php反序列化使用不当造成的漏洞/1.png" alt="p1"></p>
+<p>代码下面阴影区就是输出的结果，同样，对于反序列化的就是<img src="/2019/04/22/php反序列化使用不当造成的漏洞/2.png" alt="p2"></p>
+<p>序列化和反序列化的常见操作便像是如此，这里先送上一波源码（其实是我懒，以后代码不小心被删了，就来这里找）：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line">#serialize.php</span><br><span class="line">&lt;?php</span><br><span class="line">class MySerialize</span><br><span class="line">&#123;</span><br><span class="line">	public $nature1;</span><br><span class="line">	public $nature2;</span><br><span class="line">	public function __construct($nature1, $nature2)</span><br><span class="line">    &#123;</span><br><span class="line">        $this-&gt;nature1 = $nature1;</span><br><span class="line">        $this-&gt;nature2 = $nature2;</span><br><span class="line">    &#125;</span><br><span class="line">	public function method()</span><br><span class="line">	&#123;</span><br><span class="line">		echo &quot;I am method&quot;;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">$target = new MySerialize(&quot;value1&quot;,&quot;value2&quot;);</span><br><span class="line">echo serialize($target);</span><br><span class="line">?&gt;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">#unserialize.php</span><br><span class="line">&lt;?php</span><br><span class="line">class MySerialize</span><br><span class="line">&#123;</span><br><span class="line">	public $nature1;</span><br><span class="line">	public $nature2;</span><br><span class="line">	public function __construct($nature1, $nature2)</span><br><span class="line">    &#123;</span><br><span class="line">        $this-&gt;nature1 = $nature1;</span><br><span class="line">        $this-&gt;nature2 = $nature2;</span><br><span class="line">    &#125;</span><br><span class="line">	public function __wakeup()</span><br><span class="line">    &#123;</span><br><span class="line">        echo &quot;wakeup&lt;br \&gt;&quot;;</span><br><span class="line">    &#125;</span><br><span class="line">	public function method()</span><br><span class="line">	&#123;</span><br><span class="line">		echo &quot;I am method&quot;;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line">$target = &apos;O:11:&quot;MySerialize&quot;:2:&#123;s:7:&quot;nature1&quot;;s:6:&quot;value1&quot;;s:7:&quot;nature2&quot;;s:6:&quot;value2&quot;;&#125;&apos;;</span><br><span class="line">var_dump(unserialize($target));</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+<h3 id="序列化："><a href="#序列化：" class="headerlink" title="序列化："></a>序列化：</h3><p>&emsp;&emsp;接下来对上面的代码做一波解释，这里先介绍一下序列化后带格式的字符串的意思，在上面的<code>serialize.php</code>运行过后，可以看到一串有规律的字符串：<code>O:11:&quot;MySerialize&quot;:2:{s:7:&quot;nature1&quot;;s:6:&quot;value1&quot;;s:7:&quot;nature2&quot;;s:6:&quot;value2&quot;;}</code>，这串字符串就规定了这个对象的属性和属性值。对于一个序列化字符串，其中</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">object module:</span><br><span class="line">	O--&gt;Object，表示后面的变量的属性类型是Object类型，用法：O:size:&quot;value&quot;:num:&#123;propety module&#125;;</span><br><span class="line">  a--&gt;Array，表示后面的变量的属性类型是Array类型，用法：a:size:&#123;propety module&#125;;</span><br><span class="line">propety module:</span><br><span class="line">  S--&gt;String，表示后面的变量的属性类型是String类型，用法：s:size:&quot;value&quot;;</span><br><span class="line">  i--&gt;Integer，表示后面的变量的属性类型是Integer类型，用法：i:value;</span><br><span class="line">  b--&gt;Boolean，表示后面的变量的属性类型是Boolean类型，用法：b:value（这里的value只有1和0）；</span><br><span class="line">  N--&gt;NULL，表示后面的变量值为空，用法：N；</span><br></pre></td></tr></table></figure>
+<p>&emsp;&emsp;对比上面的解释，字符串<code>O:11:&quot;MySerialize&quot;:2:{s:7:&quot;nature1&quot;;s:6:&quot;value1&quot;;s:7:&quot;nature2&quot;;s:6:&quot;value2&quot;;}</code>就可以被解释为类对象<code>MySerialize</code>长度为11，有2个属性名：第一个属性名<code>nature1</code>是<code>string</code>类型，长度为7，它的属性值为<code>value1</code>，是<code>string</code>类型，长度为6；第二个属性名<code>nature2</code>是<code>string</code>类型，长度为7，它的属性值为<code>value2</code>，是<code>string</code>类型，长度为6。</p>
+<h3 id="反序列化："><a href="#反序列化：" class="headerlink" title="反序列化："></a>反序列化：</h3><p>&emsp;&emsp;谈完序列化，再来说说反序列化，这是一个逆序操作，将一个序列化字符串转换成一个对象或数组的过程。反序列化中最神奇的地方就是反序列化会触发特殊的魔法函数，就好像创建类对象的时候会触发它的构造函数一样</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">_construct()：创建一个对象时会被调用。</span><br><span class="line">_destruct()：销毁一个对象时会被调用。</span><br><span class="line">_wakeup()：触发unserialize()方法时会被调用。</span><br><span class="line">_sleep()：触发serialize()方法时会被调用。</span><br><span class="line">_toString()：类对象被当作一个字符串使用时会被调用。</span><br><span class="line">_get()：调出不可访问（private，protect等修饰）属性时会被调用。</span><br><span class="line">_set()：修改或写入不可访问（private，protect等修饰）属性时会被调用。</span><br><span class="line">_isset()：对不可访问（private，protect等修饰）属性使用empty()或isset()方法时会被调用。</span><br><span class="line">_unset()：对不可访问（private，protect等修饰）属性使用unset()方法时会被调用。</span><br><span class="line">_invoke()：将实例化对象当作方法使用时会被调用。</span><br></pre></td></tr></table></figure>
+<h5 id="详细说明及举例："><a href="#详细说明及举例：" class="headerlink" title="详细说明及举例："></a>详细说明及举例：</h5><ol>
+<li><p><code>_construct()</code>：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">#unserialize1.php</span><br><span class="line">&lt;?php</span><br><span class="line">class MySerialize</span><br><span class="line">&#123;</span><br><span class="line">	public $nature1;</span><br><span class="line">	public $nature2;</span><br><span class="line">	public function __construct($nature1, $nature2)</span><br><span class="line">    &#123;</span><br><span class="line">        $this-&gt;nature1 = $nature1;</span><br><span class="line">        $this-&gt;nature2 = $nature2;</span><br><span class="line">        echo &quot;i am here!&quot;;</span><br><span class="line">    &#125;</span><br><span class="line">	public function method()</span><br><span class="line">	&#123;</span><br><span class="line">		echo &quot;I am method!&quot;;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line">$target = new MySerialize(&quot;value1&quot;,NULL);</span><br><span class="line">echo &quot;&lt;br /&gt;&quot;.serialize($target);</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+<p>执行结果：<img src="/2019/04/22/php反序列化使用不当造成的漏洞/3.png" alt="p3"></p>
+<p>&emsp;&emsp;按理说这个函数应该归类在序列化里面，因为它只有在创建对象的时候才会被调用，不过它也是个魔法函数，所以就将它放到这里，从上面的演示中可以看到，_construct()函数中的echo语句执行在serialize方法之前，也就是创建MySerialize对象的时候。</p>
+</li>
+<li><p><code>_destruct()</code>：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">#unserialize2.php</span><br><span class="line">&lt;?php</span><br><span class="line">class MySerialize</span><br><span class="line">&#123;</span><br><span class="line">	public $nature1;</span><br><span class="line">	public $nature2;</span><br><span class="line">	public function __destruct()</span><br><span class="line">    &#123;</span><br><span class="line">        echo &quot;&lt;br /&gt;I am here!&quot;;</span><br><span class="line">    &#125;</span><br><span class="line">	public function method()</span><br><span class="line">	&#123;</span><br><span class="line">		echo &quot;I am method&quot;;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line">$target = &apos;O:11:&quot;MySerialize&quot;:2:&#123;s:7:&quot;nature1&quot;;s:6:&quot;value1&quot;;s:7:&quot;nature2&quot;;s:6:&quot;value2&quot;;&#125;&apos;;</span><br><span class="line">var_dump(unserialize($target));</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+<p>执行结果：<img src="/2019/04/22/php反序列化使用不当造成的漏洞/4.png" alt="p4"></p>
+<p>&emsp;&emsp;_destruct()方法就如同析构方法一样，在一个类执行完之后会自动调用，也就是说，如果在该方法中含有危险操作函数，那就有可能存在该函数被恶意执行的可能，比如，在该函数中写有<code>system($a)</code>方法，并且<code>$a=unserialize(可控值)</code>，那么，这里就可能通过可控值来执行操作。</p>
+</li>
+<li><p><code>_toString()</code>：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">#unserialize3.php</span><br><span class="line">&lt;?php</span><br><span class="line">class MySerialize</span><br><span class="line">&#123;</span><br><span class="line">	public $nature1;</span><br><span class="line">	public $nature2;</span><br><span class="line">	public function __toString()</span><br><span class="line">    &#123;</span><br><span class="line">        echo &quot;&lt;br /&gt;I am here!&quot;;</span><br><span class="line">    &#125;</span><br><span class="line">	public function method()</span><br><span class="line">	&#123;</span><br><span class="line">		echo &quot;I am method&quot;;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line">$target = &apos;O:11:&quot;MySerialize&quot;:2:&#123;s:7:&quot;nature1&quot;;s:6:&quot;value1&quot;;s:7:&quot;nature2&quot;;s:6:&quot;value2&quot;;&#125;&apos;;</span><br><span class="line">echo unserialize($target);</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+<p>执行结果：<img src="/2019/04/22/php反序列化使用不当造成的漏洞/5.png" alt="p5"></p>
+<p>&emsp;&emsp;这里在执行完<code>unserialize()</code>方法后用<code>echo</code>进行输出，因为此时<code>unserialize()</code>方法的返回值是一个含该魔法函数的对象，而该对象又被当作字符串输出，所以会触发该魔法函数。同样的道理，如果该函数中含有字符串处理的危险函数，就有可能造成源码源码泄漏。比如该魔法函数中存在<code>file_get_contents($file)</code>方法，而$file变量指向某个原本不允许直接访问的文件，并且魔法函数的触发方法可控，就会造成源码泄漏。</p>
+</li>
+<li><p><code>_sleep()</code>：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">#unserialize3.php</span><br><span class="line">&lt;?php</span><br><span class="line">class MySerialize</span><br><span class="line">&#123;</span><br><span class="line">	public $nature1;</span><br><span class="line">	public $nature2;</span><br><span class="line">	public function __sleep()</span><br><span class="line">    &#123;</span><br><span class="line">        echo &quot;i am here!&quot;;</span><br><span class="line">    &#125;</span><br><span class="line">	public function method()</span><br><span class="line">	&#123;</span><br><span class="line">		echo &quot;I am method!&quot;;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line">$target = new MySerialize(&quot;value1&quot;,123);</span><br><span class="line">echo &quot;&lt;br /&gt;&quot;.serialize($target);</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+<p>执行结果：<img src="/2019/04/22/php反序列化使用不当造成的漏洞/6.png" alt="p6"></p>
+<p>&emsp;&emsp;这里在触发<code>serialize()</code>方法时直接触发该魔法函数，执行内部代码。这里的变量被NULL序列化，所以看到的是字符N。同样的道理，如果该魔法函数中存在危险函数，就有可能造成漏洞。比如该魔法函数中存在<code>eval()</code>方法，这样就可能造成命令执行漏洞，<code>eval()</code>中如果写有两个<code></code> <code>符号，则里面的内容就会在DOS窗口运行，当然，前提是</code>shell_exec()`方法可用。</p>
+</li>
+<li><p><code>_wakeup()</code>：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">#unserialize5.php</span><br><span class="line">&lt;?php</span><br><span class="line">class MySerialize</span><br><span class="line">&#123;</span><br><span class="line">	public $nature1;</span><br><span class="line">	public $nature2;</span><br><span class="line">	public function __wakeup()</span><br><span class="line">    &#123;</span><br><span class="line">        echo &quot;&lt;br /&gt;I am here!&quot;;</span><br><span class="line">    &#125;</span><br><span class="line">	public function method()</span><br><span class="line">	&#123;</span><br><span class="line">		echo &quot;I am method&quot;;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line">$target = &apos;O:11:&quot;MySerialize&quot;:2:&#123;s:7:&quot;nature1&quot;;s:6:&quot;value1&quot;;s:7:&quot;nature2&quot;;s:6:&quot;value2&quot;;&#125;&apos;;</span><br><span class="line">echo unserialize($target);</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+<p>执行结果：<img src="/2019/04/22/php反序列化使用不当造成的漏洞/7.png" alt="p7"></p>
+<p>&emsp;&emsp;这里可以看到当执行<code>unserialize()</code>方法时就会执行该魔法函数，执行内部代码。因为这里的类对象不能作为一个输出对象，所以payload无效果。同理，如果该魔法函数中存在危险函数，就会造成危险操作。比如，该魔法函数中存在<code>exec()</code>方法，并且参数是可以控制的，那么就有可能造成命令执行漏洞。</p>
+</li>
+<li><p><code>_get()</code>：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">#unserialize6.php</span><br><span class="line">&lt;?php</span><br><span class="line">class MySerialize</span><br><span class="line">&#123;</span><br><span class="line">	private $nature1;</span><br><span class="line">	private $nature2;</span><br><span class="line">	public function __get($nature1)</span><br><span class="line">    &#123;</span><br><span class="line">        echo &quot;I am here!&quot;;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">$test = new MySerialize();</span><br><span class="line">echo $test -&gt; $nature1.&quot;&lt;br /&gt;&quot;;</span><br><span class="line">$target = &apos;O:11:&quot;MySerialize&quot;:2:&#123;s:7:&quot;nature1&quot;;s:6:&quot;value1&quot;;s:7:&quot;nature2&quot;;s:6:&quot;value2&quot;;&#125;&apos;;</span><br><span class="line">var_dump(unserialize($target));</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+<p>执行结果：<img src="/2019/04/22/php反序列化使用不当造成的漏洞/8.png" alt="p8"></p>
+<p>&emsp;&emsp;按常理来说，私有变量是不允许在类外使用的，这里的echo是无法使用的，但是类中存在该魔法函数，所以系统会自动调用它。同理，该魔法函数中如果存在危险函数，并且变量可控，就会造成危险操作。例如：该魔法函数中存在<code>popen()</code>方法，并且变量可控，就会造成文件内容泄漏。也可使用<code>passthru()</code>方法执行系统外部命令。</p>
+</li>
+</ol>
+<p>到这里，就是容易造成漏洞的几个函数的触发条件，剩下的几个暂时还没有做深入学习（其实是感觉剩下的几个触发条件有点苛刻，而且不常用，就不做笔记）。</p>
+<h5 id="CTF题目实例演示："><a href="#CTF题目实例演示：" class="headerlink" title="CTF题目实例演示："></a>CTF题目实例演示：</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br></pre></td><td class="code"><pre><span class="line">#Session.php</span><br><span class="line">&lt;?php</span><br><span class="line">include &apos;Application.php&apos;;</span><br><span class="line">class Session extends Application &#123;</span><br><span class="line">    //key建议为8位字符串</span><br><span class="line">    var $eancrykey                  = &apos;&apos;;</span><br><span class="line">    var $cookie_expiration			= 7200;</span><br><span class="line">    var $cookie_name                = &apos;ddctf_id&apos;;</span><br><span class="line">    var $cookie_path				= &apos;&apos;;</span><br><span class="line">    var $cookie_domain				= &apos;&apos;;</span><br><span class="line">    var $cookie_secure				= FALSE;</span><br><span class="line">    var $activity                   = &quot;DiDiCTF&quot;;</span><br><span class="line">    public function index()</span><br><span class="line">    &#123;</span><br><span class="line">	if(parent::auth()) &#123;</span><br><span class="line">            $this-&gt;get_key();</span><br><span class="line">            if($this-&gt;session_read()) &#123;</span><br><span class="line">                $data = &apos;DiDI Welcome you %s&apos;;</span><br><span class="line">                $data = sprintf($data,$_SERVER[&apos;HTTP_USER_AGENT&apos;]);</span><br><span class="line">                parent::response($data,&apos;sucess&apos;);</span><br><span class="line">            &#125;else&#123;</span><br><span class="line">                $this-&gt;session_create();</span><br><span class="line">                $data = &apos;DiDI Welcome you&apos;;</span><br><span class="line">                parent::response($data,&apos;sucess&apos;);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    private function get_key() &#123;</span><br><span class="line">        //eancrykey  and flag under the folder</span><br><span class="line">        $this-&gt;eancrykey =  file_get_contents(&apos;key.txt&apos;);</span><br><span class="line">    &#125;</span><br><span class="line">    public function session_read() &#123;</span><br><span class="line">        if(empty($_COOKIE)) &#123;</span><br><span class="line">        return FALSE;</span><br><span class="line">        &#125;</span><br><span class="line">        $session = $_COOKIE[$this-&gt;cookie_name];</span><br><span class="line">        if(!isset($session)) &#123;</span><br><span class="line">            parent::response(&quot;session not found&quot;,&apos;error&apos;);</span><br><span class="line">            return FALSE;</span><br><span class="line">        &#125;</span><br><span class="line">        $hash = substr($session,strlen($session)-32);</span><br><span class="line">        $session = substr($session,0,strlen($session)-32);</span><br><span class="line">        if($hash !== md5($this-&gt;eancrykey.$session)) &#123;</span><br><span class="line">            parent::response(&quot;the cookie data not match&quot;,&apos;error&apos;);</span><br><span class="line">            return FALSE;</span><br><span class="line">        &#125;</span><br><span class="line">        $session = unserialize($session);</span><br><span class="line">        if(!is_array($session) OR !isset($session[&apos;session_id&apos;]) OR !isset($session[&apos;ip_address&apos;]) OR !isset($session[&apos;user_agent&apos;]))&#123;</span><br><span class="line">            return FALSE;</span><br><span class="line">        &#125;</span><br><span class="line">        if(!empty($_POST[&quot;nickname&quot;])) &#123;</span><br><span class="line">            $arr = array($_POST[&quot;nickname&quot;],$this-&gt;eancrykey);</span><br><span class="line">            $data = &quot;Welcome my friend %s&quot;;</span><br><span class="line">            foreach ($arr as $k =&gt; $v) &#123;</span><br><span class="line">                $data = sprintf($data,$v);</span><br><span class="line">            &#125;</span><br><span class="line">            parent::response($data,&quot;Welcome&quot;);</span><br><span class="line">        &#125;</span><br><span class="line">        if($session[&apos;ip_address&apos;] != $_SERVER[&apos;REMOTE_ADDR&apos;]) &#123;</span><br><span class="line">            parent::response(&apos;the ip addree not match&apos;.&apos;error&apos;);</span><br><span class="line">            return FALSE;</span><br><span class="line">        &#125;</span><br><span class="line">        if($session[&apos;user_agent&apos;] != $_SERVER[&apos;HTTP_USER_AGENT&apos;]) &#123;</span><br><span class="line">            parent::response(&apos;the user agent not match&apos;,&apos;error&apos;);</span><br><span class="line">            return FALSE;</span><br><span class="line">        &#125;</span><br><span class="line">        return TRUE;</span><br><span class="line">    &#125;</span><br><span class="line">    private function session_create() &#123;</span><br><span class="line">        $sessionid = &apos;&apos;;</span><br><span class="line">        while(strlen($sessionid) &lt; 32) &#123;</span><br><span class="line">            $sessionid .= mt_rand(0,mt_getrandmax());</span><br><span class="line">        &#125;</span><br><span class="line">        $userdata = array(</span><br><span class="line">            &apos;session_id&apos; =&gt; md5(uniqid($sessionid,TRUE)),</span><br><span class="line">            &apos;ip_address&apos; =&gt; $_SERVER[&apos;REMOTE_ADDR&apos;],</span><br><span class="line">            &apos;user_agent&apos; =&gt; $_SERVER[&apos;HTTP_USER_AGENT&apos;],</span><br><span class="line">            &apos;user_data&apos; =&gt; &apos;&apos;,</span><br><span class="line">        );</span><br><span class="line">        $cookiedata = serialize($userdata);</span><br><span class="line">        $cookiedata = $cookiedata.md5($this-&gt;eancrykey.$cookiedata);</span><br><span class="line">        $expire = $this-&gt;cookie_expiration + time();</span><br><span class="line">        setcookie(</span><br><span class="line">            $this-&gt;cookie_name,</span><br><span class="line">            $cookiedata,</span><br><span class="line">            $expire,</span><br><span class="line">            $this-&gt;cookie_path,</span><br><span class="line">            $this-&gt;cookie_domain,</span><br><span class="line">            $this-&gt;cookie_secure</span><br><span class="line">            );</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">$ddctf = new Session();</span><br><span class="line">$ddctf-&gt;index();</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+<p>&emsp;&emsp;在这个文件中，可以看到它包含了Application.php文件，且接收进来的数据都通过cookie传送一个序列化字符串，并且通过<code>$session = unserialize($session);</code>将对象反序列化，也就是这个部分是我们可以利用的，再看看Application.php文件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line">#Application.php</span><br><span class="line">&lt;?php</span><br><span class="line">Class Application &#123;</span><br><span class="line">    var $path = &apos;&apos;;</span><br><span class="line">    public function response($data, $errMsg = &apos;success&apos;) &#123;</span><br><span class="line">        $ret = [&apos;errMsg&apos; =&gt; $errMsg,</span><br><span class="line">            &apos;data&apos; =&gt; $data];</span><br><span class="line">        $ret = json_encode($ret);</span><br><span class="line">        header(&apos;Content-type: application/json&apos;);</span><br><span class="line">        echo $ret;</span><br><span class="line">    &#125;</span><br><span class="line">    public function auth() &#123;</span><br><span class="line">        $DIDICTF_ADMIN = &apos;admin&apos;;</span><br><span class="line">        if(!empty($_SERVER[&apos;HTTP_DIDICTF_USERNAME&apos;]) &amp;&amp; $_SERVER[&apos;HTTP_DIDICTF_USERNAME&apos;] == $DIDICTF_ADMIN) &#123;</span><br><span class="line">            $this-&gt;response(&apos;您当前当前权限为管理员----请访问:app/fL2XID2i0Cdh.php&apos;);</span><br><span class="line">            return TRUE;</span><br><span class="line">        &#125;else&#123;</span><br><span class="line">            $this-&gt;response(&apos;抱歉，您没有登陆权限，请获取权限后访问-----&apos;,&apos;error&apos;);</span><br><span class="line">            return TRUE;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    private function sanitizepath($path) &#123;</span><br><span class="line">    $path = trim($path);</span><br><span class="line">    $path=str_replace(&apos;../&apos;,&apos;&apos;,$path);</span><br><span class="line">    $path=str_replace(&apos;..\\&apos;,&apos;&apos;,$path);</span><br><span class="line">    return $path;</span><br><span class="line">&#125;</span><br><span class="line">public function __destruct() &#123;</span><br><span class="line">    if(empty($this-&gt;path)) &#123;</span><br><span class="line">        exit();</span><br><span class="line">    &#125;else&#123;</span><br><span class="line">        $path = $this-&gt;sanitizepath($this-&gt;path);</span><br><span class="line">        if(strlen($path) !== 18) &#123;</span><br><span class="line">            exit();</span><br><span class="line">        &#125;</span><br><span class="line">        $this-&gt;response($data=file_get_contents($path),&apos;Congratulations&apos;);</span><br><span class="line">    &#125;</span><br><span class="line">    exit();</span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>&emsp;&emsp;这里有一个魔法函数<code>_destruct()</code>，该函数在销毁对象时触发，也就是说只要反序列化对象是我们这个类Application的对象，该函数就会被执行，现在思路就有了，构造cookie为Application的对象，并设置$path路径为要访问的路径就会触发<code>file_get_contents()</code>方法，从而得到文件的值。</p>
+<p>&emsp;&emsp;当然这道题还要绕过其他的一些限制，不过今天的重点不在解这道题，而是要利用反序列化漏洞，这里再献上cookie部分的payload：<code>O:11:&quot;Application&quot;:1:{s:4:&quot;path&quot;;s:8:&quot;flag.php&quot;;}</code>。</p>
+<h1 id="心得总结："><a href="#心得总结：" class="headerlink" title="心得总结："></a>心得总结：</h1><p>&emsp;&emsp;关于反序列化部分我学的还是不够精通，有些部分理解的不够透彻，但我觉得只要理解了被反序列化的类对象所能执行的魔法函数在什么条件下触发，就可以入门这个漏洞了。而且这个漏洞利用的前提：</p>
+<ol>
+<li>类的对象有被反序列化的过程；</li>
+<li>该类中含有魔法函数；</li>
+<li>该魔法函数中有危险函数；</li>
+<li>过滤条件不够完整。</li>
+</ol>
+<p>&emsp;&emsp;以上内容就是我对反序列化的理解，如果哪里不对，请大佬们多多批评～～～～～谢谢🙏大佬！</p>
+<p><img src="/2019/04/22/php反序列化使用不当造成的漏洞/QQ.png" alt="QQ"></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/04/06/对zip压缩包通用格式的认识/" rel="next" title="对zip压缩包通用格式的认识">
+                <i class="fa fa-chevron-left"></i> 对zip压缩包通用格式的认识
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Water Cloud</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">9</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#前言："><span class="nav-number">1.</span> <span class="nav-text">前言：</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#正文："><span class="nav-number">1.1.</span> <span class="nav-text">正文：</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#序列化："><span class="nav-number">1.1.1.</span> <span class="nav-text">序列化：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#反序列化："><span class="nav-number">1.1.2.</span> <span class="nav-text">反序列化：</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#详细说明及举例："><span class="nav-number">1.1.2.0.1.</span> <span class="nav-text">详细说明及举例：</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#CTF题目实例演示："><span class="nav-number">1.1.2.0.2.</span> <span class="nav-text">CTF题目实例演示：</span></a></li></ol></li></ol></li></ol></li></ol><li class="nav-item nav-level-1"><a class="nav-link" href="#心得总结："><span class="nav-number">2.</span> <span class="nav-text">心得总结：</span></a></li></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Water Cloud</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
