@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="前言：&amp;emsp;&amp;emsp;前几天做了一波xss的总结，之后找到了进入第十五关的地址，不过在学习过程中，又看到了两个更加好玩漏洞利用，于是乎，打完xss练习平台后就迫不及待地学起来这个，也正好完成一波学长给布置的任务。就我个人的理解，CSRF就像是一块拥有诱惑力的蛋糕，吸引着一些没有足够网络安全意识的用户走入陷阱，而SSRF就像一个有着好几个不同的门的房间，连接着服务器上不同的权限。 参考文献：">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CSRF和SSRF带来的WEB漏洞">
+<meta property="og:url" content="http://yoursite.com/2019/04/25/CSRF和SSRF带来的WEB漏洞/index.html">
+<meta property="og:site_name" content="Water Cloud">
+<meta property="og:description" content="前言：&amp;emsp;&amp;emsp;前几天做了一波xss的总结，之后找到了进入第十五关的地址，不过在学习过程中，又看到了两个更加好玩漏洞利用，于是乎，打完xss练习平台后就迫不及待地学起来这个，也正好完成一波学长给布置的任务。就我个人的理解，CSRF就像是一块拥有诱惑力的蛋糕，吸引着一些没有足够网络安全意识的用户走入陷阱，而SSRF就像一个有着好几个不同的门的房间，连接着服务器上不同的权限。 参考文献：">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="http://yoursite.com/2019/04/25/CSRF和SSRF带来的WEB漏洞/1.png">
+<meta property="og:image" content="http://yoursite.com/2019/04/25/CSRF和SSRF带来的WEB漏洞/2.png">
+<meta property="og:image" content="http://yoursite.com/2019/04/25/CSRF和SSRF带来的WEB漏洞/3.png">
+<meta property="og:image" content="http://yoursite.com/2019/04/25/CSRF和SSRF带来的WEB漏洞/4.png">
+<meta property="og:image" content="http://yoursite.com/2019/04/25/CSRF和SSRF带来的WEB漏洞/5.png">
+<meta property="og:image" content="http://yoursite.com/2019/04/25/CSRF和SSRF带来的WEB漏洞/QQ.png">
+<meta property="og:updated_time" content="2019-05-11T07:43:27.734Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="CSRF和SSRF带来的WEB漏洞">
+<meta name="twitter:description" content="前言：&amp;emsp;&amp;emsp;前几天做了一波xss的总结，之后找到了进入第十五关的地址，不过在学习过程中，又看到了两个更加好玩漏洞利用，于是乎，打完xss练习平台后就迫不及待地学起来这个，也正好完成一波学长给布置的任务。就我个人的理解，CSRF就像是一块拥有诱惑力的蛋糕，吸引着一些没有足够网络安全意识的用户走入陷阱，而SSRF就像一个有着好几个不同的门的房间，连接着服务器上不同的权限。 参考文献：">
+<meta name="twitter:image" content="http://yoursite.com/2019/04/25/CSRF和SSRF带来的WEB漏洞/1.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/04/25/CSRF和SSRF带来的WEB漏洞/">
+
+
+
+
+
+  <title>CSRF和SSRF带来的WEB漏洞 | Water Cloud</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Water Cloud</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            About
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-favorite">
+          <a href="/favorite/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heart"></i> <br>
+            
+            favorite
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            Archives
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-schedule">
+          <a href="/schedule/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-calendar"></i> <br>
+            
+            Schedule
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/04/25/CSRF和SSRF带来的WEB漏洞/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Water Cloud">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Water Cloud">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">CSRF和SSRF带来的WEB漏洞</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-04-25T16:27:00+08:00">
+                2019-04-25
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="前言："><a href="#前言：" class="headerlink" title="前言："></a>前言：</h1><p>&emsp;&emsp;前几天做了一波xss的总结，之后找到了进入第十五关的地址，不过在学习过程中，又看到了两个更加好玩漏洞利用，于是乎，打完xss练习平台后就迫不及待地学起来这个，也正好完成一波学长给布置的任务。就我个人的理解，CSRF就像是一块拥有诱惑力的蛋糕，吸引着一些没有足够网络安全意识的用户走入陷阱，而SSRF就像一个有着好几个不同的门的房间，连接着服务器上不同的权限。</p>
+<p>参考文献：<a href="https://www.bilibili.com/video/av41286463?from=search&amp;seid=2690147047869633725" target="_blank" rel="noopener">半夏小哥哥的教学视频</a>、<a href="https://www.bilibili.com/video/av37393329/" target="_blank" rel="noopener">倾旋小哥哥的教学视频</a></p>
+<h1 id="正文："><a href="#正文：" class="headerlink" title="正文："></a>正文：</h1><p>&emsp;&emsp;CSRF的全称是跨站请求伪造（Cross-site request forgery），是基于客户端操作的请求伪造，简单说，会话对象只有两个，攻击者利用正常的登录状态对网站内部对某些请求操作进行截取，并将其伪造成网页中具有某些诱惑效果的html代码链接，比如图片点击事件，这样其他用户在无意中点击该图片的时候就会触发该操作，当然这个是有前提的，用户必须要信任该网站，也就是利用用户保存在浏览器上的隐式验证，比如说cookie。</p>
+<h3 id="CSRF实例："><a href="#CSRF实例：" class="headerlink" title="CSRF实例："></a>CSRF实例：</h3><p>&emsp;&emsp;对于一些交互网站，一般都会有用户的登录界面和密码修改界面，如果说恶意用户制造了一个修改密码的URL(其实就是抓取修改密码时的请求)，并以其他的形式留在该网站上，比如说以<code>&lt;img src=&#39;shellcode&#39;&gt;</code>标签形式留在留言板上，这就会造成其他用户在无意中点击该标签的时候修改了自己的密码。这里有一张来自网上的图：</p>
+<p><img src="/2019/04/25/CSRF和SSRF带来的WEB漏洞/1.png" alt="p1"></p>
+<p>大致来说的CSRF攻击步骤就如上图所示，这里在做一个简单的攻击实例：<img src="/2019/04/25/CSRF和SSRF带来的WEB漏洞/2.png" alt="p2"></p>
+<p>&emsp;&emsp;在这个找回密码的界面中，我们需要提交三个参数才能完成密码的更新：<code>password</code>、<code>checkpassword</code>、<code>submit</code>，后台的过滤语句并没有对这三个参数进行严格的控制，造成这里的URL可直接访问，也就是CSRF触发的前提条件之一成立，所以就会有恶意用户在这里构造恶意语句：<code>&lt;img src=&#39;http://127.0.0.1:8080/CSRF&amp;SSRF/manage.php?password=admin&amp;checkpassword=admin&amp;submit=submit&#39;&gt;</code>，这条语句可以出现一些论坛之类等该用户经常访问的网站上，如果受害用户在登录该网站的时候同时点击了论坛上的该图片标签，他的网站密码就会被改成<code>admin</code>。当然这只是一个举例，CSRF还有更加危险的操作，例如对账户进行转账等危险操作，不过一般大型公司的网站是不允许有该漏洞存在的。</p>
+<p>&emsp;&emsp;因为这里的代码是个人坐实验用的，所以仅供参考：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line">界面部分</span><br><span class="line">&lt;form action=&quot;GetNewPassword.php&quot; method=&quot;GET&quot;&gt;</span><br><span class="line">  &lt;h3&gt;找回密码&lt;/h3&gt;</span><br><span class="line">  NewPassword:&lt;input type=&quot;password&quot; name=&quot;password&quot; value=&quot;&quot;&gt;&lt;br /&gt;</span><br><span class="line">  ReNPassword:&lt;input type=&quot;password&quot; name=&quot;checkpassword&quot; value=&quot;&quot;&gt;&lt;br /&gt;</span><br><span class="line">  &lt;input type=&quot;submit&quot; name=&quot;submit&quot; value=&quot;submit&quot; class=&quot;submit&quot;&gt;</span><br><span class="line">&lt;/form&gt;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">后台处理</span><br><span class="line">&lt;?php</span><br><span class="line">error_reporting(0);</span><br><span class="line">if(isset($_GET[&apos;submit&apos;])&amp;&amp;$_GET[&apos;submit&apos;]===&apos;submit&apos;)&#123;</span><br><span class="line">	session_start();</span><br><span class="line">	$_SESSION[&apos;islogin&apos;]=1;</span><br><span class="line">	if(isset($_GET[&apos;password&apos;])&amp;&amp;isset($_GET[&quot;checkpassword&quot;])&amp;&amp;!empty($_GET[&apos;password&apos;])&amp;&amp;!empty($_GET[&apos;checkpassword&apos;])&amp;&amp;$_GET[&apos;password&apos;]===$_GET[&apos;checkpassword&apos;])&#123;</span><br><span class="line">		//数据库连接操作</span><br><span class="line">		include_once &apos;mysqli.php&apos;;</span><br><span class="line">		$link=mysqlconnect();</span><br><span class="line">		$sql=&quot;select * from users&quot;;</span><br><span class="line">		$sql=escape($link,$sql);//转义字符串</span><br><span class="line">		$result=execute($link,$sql);</span><br><span class="line">		while($column=@mysqli_fetch_array($result))&#123;</span><br><span class="line">			if($_SESSION[&apos;user&apos;]===$column[&apos;username&apos;])&#123;</span><br><span class="line">				$sql2=&quot;update users set password=&apos;&#123;$_GET[&apos;password&apos;]&#125;&apos; where username=&apos;&#123;$_SESSION[&apos;user&apos;]&#125;&apos;&quot;;</span><br><span class="line">				$result=execute($link,$sql2);</span><br><span class="line">				if($result)&#123;</span><br><span class="line">					echo &quot;&lt;span style=&apos;margin-left:36%;&apos; content=‘3;URL=login.html’&gt;密码修改成功！三秒后返回登录界面。&lt;/sapn&gt; | &quot;;</span><br><span class="line">					echo &quot;&lt;a style=&apos;color:red;&apos; href=&apos;login.html&apos;&gt;直接前往！&lt;/a&gt;&quot;;</span><br><span class="line">				&#125;else&#123;</span><br><span class="line">					header(&apos;location:manage.php&apos;);</span><br><span class="line">				&#125;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	else&#123;</span><br><span class="line">		header(&apos;location:manage.php&apos;);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;else&#123;</span><br><span class="line">	header(&apos;location:manage.php&apos;);</span><br><span class="line">&#125;</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+<p>&emsp;&emsp;因为这里设计的用户名部分是通过<code>$_SESSION</code>超级变量来获取的，所以漏洞触发地点也必须是在网站内部。这个是比较简单，只要利用一个标签就可以诱惑用户，危害明显比较大。再看看另一种提交方式：<img src="/2019/04/25/CSRF和SSRF带来的WEB漏洞/3.png" alt="p3"></p>
+<p>&emsp;&emsp;这个是post类型传参方式，相对于get型传参，它的CSRF攻击方式会更加麻烦一点，因为post类型不会形成一个URL，所以，要形成一个post类型的CSRF攻击，一般都会选择做一个钓鱼网站，界面的东西看起来是和正常无害界面一样，但后面的代码确实对传入的数据进行另类处理。不过，现在的互联网用户越来越多，大家对钓鱼网站也有了自己的认识，轻易不会上当。所以，在我看来，这个WEB漏洞存在的意义不大。</p>
+<h5 id="防御方式："><a href="#防御方式：" class="headerlink" title="防御方式："></a>防御方式：</h5><ol>
+<li>设置和判断cookie时采用hash值认证，一般攻击者再看到hash值时扭头就走，原因自然是不言而喻。</li>
+<li>尽量采用post类型传参，这就减少了请求被直接伪造的可能。</li>
+<li>采用验证码判断，这也是一道艰难的工程，想识别验证码的步骤就有点繁杂了。</li>
+</ol>
+<p>&emsp;&emsp;SSRF的全称是服务端请求伪造（Server-Side Request Forgery），由于某些应用需要调用其他服务器上的资源，需要传入一个目标地址提供给服务器请求，这就会造成攻击者利用该地址促使服务器访问内网的其他服务，简单说，SSRF就是通过获取资源的请求发送给服务器，利用一个服务器做跳板来访问其他服务器上的资源，适用于主机信息收集、WEB应用指纹识别、根据应用识别payload进行攻击和拒绝服务攻击。</p>
+<h3 id="SSRF实例："><a href="#SSRF实例：" class="headerlink" title="SSRF实例："></a>SSRF实例：</h3><p>&emsp;&emsp;有csrf的基础，ssrf看起来就比较简单，可以利用权限较高的服务器的身份来访问其他服务器上的资源。这里举一个远程文件读取函数使用不当造成的ssrf漏洞：<img src="/2019/04/25/CSRF和SSRF带来的WEB漏洞/4.png" alt="p4"></p>
+<p>再看一下ssrf.php文件源码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">header(&apos;Content-Type:image/png&apos;);</span><br><span class="line">if($_REQUEST[&apos;p&apos;]==1)&#123;</span><br><span class="line">	$file=empty($_REQUEST[&apos;img&apos;])?FALSE:$_REQUEST[&apos;img&apos;];</span><br><span class="line">	if($file)&#123;</span><br><span class="line">		$fp=fopen($file, &apos;r&apos;);</span><br><span class="line">		$result=fread($fp,filesize($file));</span><br><span class="line">		echo $result;</span><br><span class="line">		fclose($file);</span><br><span class="line">	&#125;else&#123;</span><br><span class="line">		echo &apos;1&lt;hr /&gt;&apos;;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line">if($_REQUEST[&apos;p&apos;]==2)&#123;</span><br><span class="line">	$file=empty($_REQUEST[&apos;img&apos;])?FALSE:$_REQUEST[&apos;img&apos;];</span><br><span class="line">	if($file)&#123;</span><br><span class="line">		$result=file_get_contents($file);</span><br><span class="line">		echo $result;</span><br><span class="line">	&#125;else&#123;</span><br><span class="line">		echo &apos;2&lt;hr /&gt;&apos;;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+<p>第二个判断语句中，执行了一个远程文件读取的方法<code>file_get_contents()</code>，就相当与可以借助这台服务器来访问其他服务器上的内容，这就是一个前提条件。当然，如果存在第一个判断语句里面的内容，那还可以使用其他的伪协议 ，例如file协议，ftp协议等等。当然，一般程序员是不会直接输出文件内容的，不过这个可以用来判断服务器开了哪些主机存活，可以利用一些站点常见的文件来实现，比如favicon.ico文件，根据返回时间长短可以判断该主机是否存在，存在的主机返回的速度很快，一般多是1秒之内，不存在的主机返回速度很慢，大概会超过20秒。</p>
+<h5 id="SSRF漏洞出现位置："><a href="#SSRF漏洞出现位置：" class="headerlink" title="SSRF漏洞出现位置："></a>SSRF漏洞出现位置：</h5><ol>
+<li>通过URL地址分享网页内容；</li>
+<li>转码服务；</li>
+<li>在线翻译；</li>
+<li>通过URL地址加载与下载图片；</li>
+<li>图片、文章收藏功能；</li>
+<li>未公开的API实现以及其他调用URL的功能；</li>
+<li>从URL关键字中寻找share、wap、url、link、src、source、target、u、3g、display、sourceURL、imageURL、domain等等可控关键字。</li>
+</ol>
+<h5 id="SSRF远程文件访问："><a href="#SSRF远程文件访问：" class="headerlink" title="SSRF远程文件访问："></a>SSRF远程文件访问：</h5><p>&emsp;&emsp;这里举例一个SSRF的远程文件访问操作，先看一触发的代码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">#ssrf_far.php</span><br><span class="line">&lt;?php</span><br><span class="line">$str=$_POST[&apos;url&apos;];</span><br><span class="line">$str=file_get_contents($str);</span><br><span class="line">$str($_POST[&apos;cmd&apos;]);</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+<p>这里就是一个程序员在做远程访问的时候常见的三行代码，有这三行代码存在，就会造成上述漏洞，再看一下执行效果：<img src="/2019/04/25/CSRF和SSRF带来的WEB漏洞/5.png" alt="p5"></p>
+<p>这里ssrf_far.php中含有造成远程文件访问漏洞的代码，恶意攻击者就会利用该效果将URL地址定向到一个自己可以控制的服务器的站点文件内，就比如这里的assert.txt文件中写的内容就是<code>shell_exec</code>，这样就将ssrf_far.php文件的第三行代码变成了一个可以执行系统命令的php函数，造成一个危险操作。</p>
+<h5 id="防御方式：-1"><a href="#防御方式：-1" class="headerlink" title="防御方式："></a>防御方式：</h5><ol>
+<li>过滤返回信息，验证远程服务器对请求的响应是比较容易的方法。如果web应用是去获取某一种类型的文件。那么在把返回结果展示给用户之前先验证返回的信息是否符合标准。</li>
+<li>统一错误信息，避免用户可以根据错误信息来判断远端服务器的端口状态。</li>
+<li>限制请求的端口为http常用的端口，比如：80、443等。</li>
+<li>黑名单内网ip。避免应用被用来获取获取内网数据，攻击内网。</li>
+<li>禁用不需要的协议。仅仅允许http和https请求。可以防止类似于file:///,gopher://,ftp:// 等引起的问题。</li>
+</ol>
+<h1 id="总结："><a href="#总结：" class="headerlink" title="总结："></a>总结：</h1><p>&emsp;&emsp;因为我也是最近刚刚开始接触csrf和ssrf，所以对它们的理解不是很深刻，总感觉理解不到里面的奥义，希望有师傅能带带我，指点一下迷津。这是我的QQ</p>
+<p><img src="/2019/04/25/CSRF和SSRF带来的WEB漏洞/QQ.png" alt="QQ"></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/04/22/php反序列化使用不当造成的漏洞/" rel="next" title="php反序列化使用不当造成的漏洞">
+                <i class="fa fa-chevron-left"></i> php反序列化使用不当造成的漏洞
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Water Cloud</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">10</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#前言："><span class="nav-number">1.</span> <span class="nav-text">前言：</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#正文："><span class="nav-number">2.</span> <span class="nav-text">正文：</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#CSRF实例："><span class="nav-number">2.0.1.</span> <span class="nav-text">CSRF实例：</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#防御方式："><span class="nav-number">2.0.1.0.1.</span> <span class="nav-text">防御方式：</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SSRF实例："><span class="nav-number">2.0.2.</span> <span class="nav-text">SSRF实例：</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#SSRF漏洞出现位置："><span class="nav-number">2.0.2.0.1.</span> <span class="nav-text">SSRF漏洞出现位置：</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#SSRF远程文件访问："><span class="nav-number">2.0.2.0.2.</span> <span class="nav-text">SSRF远程文件访问：</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#防御方式：-1"><span class="nav-number">2.0.2.0.3.</span> <span class="nav-text">防御方式：</span></a></li></ol></li></ol><li class="nav-item nav-level-1"><a class="nav-link" href="#总结："><span class="nav-number">3.</span> <span class="nav-text">总结：</span></a></li></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Water Cloud</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
