@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="前言：&amp;emsp;&amp;emsp;接上次代码执行漏洞之后，还有一个跟它相似的命令执行漏洞。这两者的区别就是代码执行漏洞完全限制与语言本身，也就是php代码执行漏洞就要遵循PHP语言规则才能执行；而命令执行漏洞只受限制于网站所在系统，也就是Linux网站遵循Linux系统命令，Windows网站遵循windows系统命令。 参考文献：水清云影的教学视频 正文：&amp;emsp;&amp;emsp;关于命令执行漏洞的概">
+<meta property="og:type" content="article">
+<meta property="og:title" content="PHP代码审计之命令执行漏洞">
+<meta property="og:url" content="http://yoursite.com/2019/05/28/PHP代码审计之命令执行漏洞/index.html">
+<meta property="og:site_name" content="Water Cloud">
+<meta property="og:description" content="前言：&amp;emsp;&amp;emsp;接上次代码执行漏洞之后，还有一个跟它相似的命令执行漏洞。这两者的区别就是代码执行漏洞完全限制与语言本身，也就是php代码执行漏洞就要遵循PHP语言规则才能执行；而命令执行漏洞只受限制于网站所在系统，也就是Linux网站遵循Linux系统命令，Windows网站遵循windows系统命令。 参考文献：水清云影的教学视频 正文：&amp;emsp;&amp;emsp;关于命令执行漏洞的概">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="http://yoursite.com/2019/05/28/PHP代码审计之命令执行漏洞/1.png">
+<meta property="og:image" content="http://yoursite.com/2019/05/28/PHP代码审计之命令执行漏洞/2.png">
+<meta property="og:image" content="http://yoursite.com/2019/05/28/PHP代码审计之命令执行漏洞/3.png">
+<meta property="og:image" content="http://yoursite.com/2019/05/28/PHP代码审计之命令执行漏洞/4.png">
+<meta property="og:image" content="http://yoursite.com/2019/05/28/PHP代码审计之命令执行漏洞/5.png">
+<meta property="og:image" content="http://yoursite.com/2019/05/28/PHP代码审计之命令执行漏洞/QQ.png">
+<meta property="og:updated_time" content="2019-05-29T12:28:39.521Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="PHP代码审计之命令执行漏洞">
+<meta name="twitter:description" content="前言：&amp;emsp;&amp;emsp;接上次代码执行漏洞之后，还有一个跟它相似的命令执行漏洞。这两者的区别就是代码执行漏洞完全限制与语言本身，也就是php代码执行漏洞就要遵循PHP语言规则才能执行；而命令执行漏洞只受限制于网站所在系统，也就是Linux网站遵循Linux系统命令，Windows网站遵循windows系统命令。 参考文献：水清云影的教学视频 正文：&amp;emsp;&amp;emsp;关于命令执行漏洞的概">
+<meta name="twitter:image" content="http://yoursite.com/2019/05/28/PHP代码审计之命令执行漏洞/1.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/05/28/PHP代码审计之命令执行漏洞/">
+
+
+
+
+
+  <title>PHP代码审计之命令执行漏洞 | Water Cloud</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Water Cloud</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            About
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-favorite">
+          <a href="/favorite/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heart"></i> <br>
+            
+            favorite
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            Archives
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-schedule">
+          <a href="/schedule/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-calendar"></i> <br>
+            
+            Schedule
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/05/28/PHP代码审计之命令执行漏洞/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Water Cloud">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Water Cloud">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">PHP代码审计之命令执行漏洞</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-05-28T20:40:33+08:00">
+                2019-05-28
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="前言："><a href="#前言：" class="headerlink" title="前言："></a>前言：</h1><p>&emsp;&emsp;接上次<a href="https://shuishangyun.github.io/2019/05/27/PHP代码审计之代码执行漏洞/" target="_blank" rel="noopener">代码执行漏洞</a>之后，还有一个跟它相似的命令执行漏洞。这两者的区别就是代码执行漏洞完全限制与语言本身，也就是php代码执行漏洞就要遵循PHP语言规则才能执行；而命令执行漏洞只受限制于网站所在系统，也就是Linux网站遵循Linux系统命令，Windows网站遵循windows系统命令。</p>
+<p>参考文献：<a href="https://www.bilibili.com/video/av48675526/?p=9" target="_blank" rel="noopener">水清云影的教学视频</a></p>
+<h1 id="正文："><a href="#正文：" class="headerlink" title="正文："></a>正文：</h1><p>&emsp;&emsp;关于命令执行漏洞的概念：命令执行漏洞是程序将不安全的用户数据（表单，cookie，http头等）传递给系统shell时，就有可能存在命令注入。该漏洞的存在原理和代码执行漏洞有点类似，只是使用的函数有所不同。</p>
+<p>&emsp;&emsp;关于命令执行漏洞的利用条件：一是存在可执行系统命令的高危函数，二是用户可以直接或间接控制该函数的参数，三是对该参数的过滤不够严谨。</p>
+<p>&emsp;&emsp;关于命令执行漏洞的类型：</p>
+<ol>
+<li>代码层过滤不严造成的命令执行漏洞；</li>
+<li>系统本身存在的命令执行漏洞；</li>
+<li>调用的第三方组件存在命令执行漏洞。</li>
+</ol>
+<h3 id="PHP中可能造成命令执行漏洞的函数："><a href="#PHP中可能造成命令执行漏洞的函数：" class="headerlink" title="PHP中可能造成命令执行漏洞的函数："></a>PHP中可能造成命令执行漏洞的函数：</h3><ol>
+<li><code>system()函数</code>：原型<code>string system( string $command [,int &amp;$return_var ])</code>，本函数执行 <code>command</code> 参数所指定的命令， 并且输出执行结果。如果 PHP 运行在服务器模块中， <strong>system()</strong> 函数还会尝试在每行输出完毕之后， 自动刷新 web 服务器的输出缓存。</li>
+<li><code>passthru()函数</code>：原型<code>void passthru(string $command [,int &amp;$return_var])</code>，<strong>passthru()</strong> 函数 也是用来执行外部命令（<code>command</code>）的。常用来执行诸如 pbmplus 之类的可以直接输出图像流的命令。 通过设置 Content-type 为 <em>image/gif</em>， 然后调用 pbmplus 程序输出 gif 文件， 就可以从 PHP 脚本中直接输出图像到浏览器。</li>
+<li><code>exec()函数</code>：原型<code>string exec(string $command[,array &amp;$output[,int &amp;$return_var]])</code>，执行 <code>command</code> 参数所指定的系统命令。</li>
+<li><code>shell_exec()函数</code>：原型<code>string exec( $command, [$output, [return_var]])</code>，PHP中的一个内置函数，用于通过shell执行命令并以字符串的形式返回完整的输出。shell_exec是backtick操作符的别名，用于*nix。如果命令失败，则返回NULL，并且这些值对于错误检查不可靠。</li>
+</ol>
+<h3 id="命令执行函数使用实例："><a href="#命令执行函数使用实例：" class="headerlink" title="命令执行函数使用实例："></a>命令执行函数使用实例：</h3><ol>
+<li><p><code>system()</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">system.php</span><br><span class="line">&lt;?php</span><br><span class="line">$shell=$_GET[&apos;shell&apos;];</span><br><span class="line">system($shell);</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+<p>执行效果如下：<img src="/2019/05/28/PHP代码审计之命令执行漏洞/1.png" alt="p1"></p>
+<p>&emsp;&emsp;这个函数可以直接将命令带入系统之中，并将结果存为字符串返回输出到浏览界面。而且该函数还可以将结果当作一个字符串返回值进行操作。</p>
+</li>
+<li><p><code>passthru()</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">passthru.php</span><br><span class="line">&lt;?php</span><br><span class="line">$shell=$_GET[&apos;shell&apos;];</span><br><span class="line">passthru($shell);</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+<p>执行效果如下：<img src="/2019/05/28/PHP代码审计之命令执行漏洞/2.png" alt="p2"></p>
+<p>&emsp;&emsp;该函数直接将结果打印到浏览器上，没有返回值。</p>
+</li>
+<li><p><code>exec()函数</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">exec.php</span><br><span class="line">&lt;?php</span><br><span class="line">$shell=$_GET[&apos;shell&apos;];</span><br><span class="line">echo exec($shell);</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+<p>执行效果如下：<img src="/2019/05/28/PHP代码审计之命令执行漏洞/3.png" alt="p3"></p>
+<p>&emsp;&emsp;该函数执行命令后并不会将结果返回到浏览器上，而且之后保存其中最后一行的结果，这里为方便演示，使用了一个输出关键字，但这并不代表结果是exec函数输出的，只能说明exec在执行完命令后会保存最后一行结果。</p>
+</li>
+<li><p><code>shell_exec()</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">shell_exec.php</span><br><span class="line">&lt;?php</span><br><span class="line">$shell=$_GET[&apos;shell&apos;];</span><br><span class="line">echo shell_exec($shell);</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+<p>执行效果如下；<img src="/2019/05/28/PHP代码审计之命令执行漏洞/4.png" alt="p4"></p>
+<p>&emsp;&emsp;该函数与exec函数相似，同样不会直接输出结果到浏览器，但会将命令执行后的所有结果保存下来。与之相似的还有一个反引号，功能与shell_exec()函数完全一样。<img src="/2019/05/28/PHP代码审计之命令执行漏洞/5.png" alt="p5"></p>
+</li>
+</ol>
+<h5 id="命令执行漏洞的防范："><a href="#命令执行漏洞的防范：" class="headerlink" title="命令执行漏洞的防范："></a>命令执行漏洞的防范：</h5><ol>
+<li>代码层方面对用户的传参进行严格的过滤，如果能将参数写死，尽量不要用可控变量代替；</li>
+<li>系统方面注意定期为系统打补丁；</li>
+<li>有命令执行了漏洞的第三方软件能不要尽量不要使用。</li>
+</ol>
+<h1 id="总结："><a href="#总结：" class="headerlink" title="总结："></a>总结：</h1><p>&emsp;&emsp;本篇文章中主要记录代码层造成的命令注入漏洞，系统层面和第三方组件暂时不做总结，以后找到环境了在总结一波，这些就是我目前掌握的命令执行漏洞，如果有有不正确和不完整的地方，还请大佬们多多批评：</p>
+<p><img src="/2019/05/28/PHP代码审计之命令执行漏洞/QQ.png" alt="QQ"></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/05/27/PHP代码审计之代码执行漏洞/" rel="next" title="PHP代码审计之代码执行漏洞">
+                <i class="fa fa-chevron-left"></i> PHP代码审计之代码执行漏洞
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Water Cloud</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">13</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#前言："><span class="nav-number">1.</span> <span class="nav-text">前言：</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#正文："><span class="nav-number">2.</span> <span class="nav-text">正文：</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#PHP中可能造成命令执行漏洞的函数："><span class="nav-number">2.0.1.</span> <span class="nav-text">PHP中可能造成命令执行漏洞的函数：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#命令执行函数使用实例："><span class="nav-number">2.0.2.</span> <span class="nav-text">命令执行函数使用实例：</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#命令执行漏洞的防范："><span class="nav-number">2.0.2.0.1.</span> <span class="nav-text">命令执行漏洞的防范：</span></a></li></ol></li></ol></li></ol><li class="nav-item nav-level-1"><a class="nav-link" href="#总结："><span class="nav-number">3.</span> <span class="nav-text">总结：</span></a></li></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Water Cloud</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
